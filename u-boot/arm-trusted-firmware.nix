@@ -1,11 +1,15 @@
-{ stdenv }:
+{ stdenv, fetchFromGitHub }:
 
 stdenv.mkDerivation {
+  name = "arm-trusted-firmware-espressobin";
+
+  phases = [ "unpackPhase" "patchPhase" "installPhase" ];
+
   src = fetchFromGitHub {
     owner = "MarvellEmbeddedProcessors";
     repo = "atf-marvell";
     rev = "43965481990fd92e9666cf9371a8cf478055ec7c";
-    sha256 = "0hqr80hgk6j1pnvhi5sfb9q3j0gx1wx81nzbhnhsw5afkw855jd9"
+    sha256 = "152rs8bilxhzfrjqggckvq493bnjqn7lg23fbs5bsfvjy29s0z2a";
   };
 
   patches = [
@@ -15,12 +19,12 @@ stdenv.mkDerivation {
 
   # We just want the contents of the repo.
   installPhase = ''
+    mkdir -p $out
     cp -r $src/* $out
   '';
 
   meta = with stdenv.lib; {
     maintainers = [ maintainers.mirrexagon ];
-    platforms = [ "aarch64-linux" ];
     # ?
     license = licenses.unfreeRedistributableFirmware;
   };

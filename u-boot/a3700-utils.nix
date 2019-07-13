@@ -1,13 +1,15 @@
-{ stdenv }:
+{ stdenv, fetchFromGitHub }:
 
 stdenv.mkDerivation {
   name = "a3700-utils-espressobin";
+
+  phases = [ "unpackPhase" "patchPhase" "installPhase" ];
 
   src = fetchFromGitHub {
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
     rev = "34ce2160a1521dda9c7c68e06fcde83242dee94a";
-    sha256 = "0hqr80hgk6j1pnvhi5sfb9q3j0gx1wx81nzbhnhsw5afkw855jd9"
+    sha256 = "1x026rxknrnzlkaa79a13l26dl5rj1d6aa9dij13ir7pqpznfws6";
   };
 
   patches = [
@@ -21,12 +23,12 @@ stdenv.mkDerivation {
 
   # We just want the contents of the repo.
   installPhase = ''
+    mkdir -p $out
     cp -r $src/* $out
   '';
 
   meta = with stdenv.lib; {
     maintainers = [ maintainers.mirrexagon ];
-    platforms = [ "aarch64-linux" ];
     # ?
     license = licenses.unfreeRedistributableFirmware;
   };
