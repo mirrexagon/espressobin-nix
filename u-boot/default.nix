@@ -1,7 +1,7 @@
 { lib, buildUBoot, fetchFromGitHub }:
 
 buildUBoot rec {
-  version = "2018.03";
+  version = "2017.03";
 
   src = fetchFromGitHub {
     owner = "MarvellEmbeddedProcessors";
@@ -23,6 +23,10 @@ buildUBoot rec {
     ./0003-mtd-add-issi-is25wp032d-spi-flash-support.patch
     ./0004-mtd-add-macronix-mx25u3235f-spi-flash-support.patch
     ./0005-mtd-add-gigadevice-gd25lq32d-spi-flash-support.patch
+
+    # Mine.
+    ./0001-fdt-make-compatible-with-dtc-1.4.6.patch
+    ./0002-Remove-duplicate-const.patch
   ];
 
   extraMakeFlags = [ "DEVICE_TREE=armada-3720-espressobin" ];

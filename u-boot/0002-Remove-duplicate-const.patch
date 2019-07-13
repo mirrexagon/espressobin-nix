@@ -1,0 +1,25 @@
+From fe17657a9cc7fe36476aa07c5b989d4bd467644d Mon Sep 17 00:00:00 2001
+From: Andrew Abbott <mirrexagon@mirrexagon.com>
+Date: Sat, 13 Jul 2019 15:45:23 +1000
+Subject: [PATCH 2/2] Remove duplicate const
+
+---
+ drivers/usb/eth/r8152.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/usb/eth/r8152.c b/drivers/usb/eth/r8152.c
+index ed441f3243..4ba47bdd07 100644
+--- a/drivers/usb/eth/r8152.c
++++ b/drivers/usb/eth/r8152.c
+@@ -59,7 +59,7 @@ struct r8152_version {
+ 	bool           gmii;
+ };
+ 
+-static const struct r8152_version const r8152_versions[] = {
++static const struct r8152_version r8152_versions[] = {
+ 	{ 0x4c00, RTL_VER_01, 0 },
+ 	{ 0x4c10, RTL_VER_02, 0 },
+ 	{ 0x5c00, RTL_VER_03, 1 },
+-- 
+2.22.0
+
