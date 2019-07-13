@@ -4,7 +4,9 @@ http://espressobin.net/
 ## My board
 I have an V7 1GB board.
 
-## Resources
+## U-boot
+
+### Links
 Bootloader build instructions.
 http://wiki.espressobin.net/tiki-index.php?page=Build+From+Source+-+Bootloader
 

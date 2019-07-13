@@ -1,0 +1,26 @@
+From 749025d2dd5aae37ab321bb65285fc3830d03564 Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Mon, 20 Nov 2017 09:11:37 +0800
+Subject: [PATCH 1/5] git: add some temporary files into git ignore list
+
+add some temporary files (tools/libfdt.*)into git ignore list
+---
+ .gitignore | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index 7fac5b3..5df73a3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -84,3 +84,8 @@ GTAGS
+ *.orig
+ *~
+ \#*#
++
++# u-boot tmp files
++tools/_libfdt.so
++tools/libfdt.py
++tools/libfdt_wrap.c
+-- 
+1.9.1
+

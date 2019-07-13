@@ -1,0 +1,25 @@
+From 14aeedc5e2b76af1f44d20ca273cfcfc2472657a Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Mon, 21 May 2018 11:25:44 +0800
+Subject: [PATCH 4/5] mtd: add macronix mx25u3235f spi flash support
+
+Add macronix mx25u3235f spi flash (4MBytes) support
+---
+ drivers/mtd/spi/spi_flash_ids.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mtd/spi/spi_flash_ids.c b/drivers/mtd/spi/spi_flash_ids.c
+index 68e9638..66decb5 100644
+--- a/drivers/mtd/spi/spi_flash_ids.c
++++ b/drivers/mtd/spi/spi_flash_ids.c
+@@ -83,6 +83,7 @@ const struct spi_flash_info spi_flash_ids[] = {
+ 	{"mx25l25635f",	   INFO(0xc22019, 0x0, 64 * 1024,   512, RD_FULL | WR_QPP) },
+ 	{"mx25l51235f",	   INFO(0xc2201a, 0x0, 64 * 1024,  1024, RD_FULL | WR_QPP) },
+ 	{"mx25l12855e",	   INFO(0xc22618, 0x0, 64 * 1024,   256, RD_FULL | WR_QPP) },
++	{"mx25u3235f",	   INFO(0xc22536, 0x0, 64 * 1024,    64, RD_FULL | WR_QPP) },
+ 	{"mx66u51235f",    INFO(0xc2253a, 0x0, 64 * 1024,  1024, RD_FULL | WR_QPP) },
+ 	{"mx66l1g45g",     INFO(0xc2201b, 0x0, 64 * 1024,  2048, RD_FULL | WR_QPP) },
+ #endif
+-- 
+1.9.1
+
