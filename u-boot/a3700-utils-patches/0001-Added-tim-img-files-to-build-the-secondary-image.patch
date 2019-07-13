@@ -1,0 +1,108 @@
+From 51fdd67a713dc2e26517f87713a22d49749b301b Mon Sep 17 00:00:00 2001
+From: Benjamin Huang <gdhuang@marvell.com>
+Date: Wed, 1 Feb 2017 17:23:36 -0800
+Subject: [PATCH 1/6] Added tim/img files to build the secondary image
+
+A3700 bootROM supports booting from the SPI flash at the
+address 0x200000 if the data on header of the SPI flash
+is corrupted. Creating the secondary flash-image will need
+to setup the tim.txt and img-*.txt with the correct offset.
+
+This commit is to checkin the tim/img-1/img-2 files with
+the 2MB offset which are needed to build the secondary
+boot flash image.
+
+Also included a readme file with descriptions on how to
+build and burn the secondary boot image.
+
+Change-Id: Ib6364ece2b257a4c4b1b864341ab04b0984226bc
+---
+ tim/untrusted/secondary/img-1.txt |  8 ++++++++
+ tim/untrusted/secondary/img-2.txt |  8 ++++++++
+ tim/untrusted/secondary/readme    | 28 ++++++++++++++++++++++++++++
+ tim/untrusted/secondary/tim.txt   |  8 ++++++++
+ 4 files changed, 52 insertions(+)
+ create mode 100644 tim/untrusted/secondary/img-1.txt
+ create mode 100644 tim/untrusted/secondary/img-2.txt
+ create mode 100644 tim/untrusted/secondary/readme
+ create mode 100644 tim/untrusted/secondary/tim.txt
+
+diff --git a/tim/untrusted/secondary/img-1.txt b/tim/untrusted/secondary/img-1.txt
+new file mode 100644
+index 0000000..6c64068
+--- /dev/null
++++ b/tim/untrusted/secondary/img-1.txt
+@@ -0,0 +1,8 @@
++Image ID:                       0x57544d49		; WTMI
++Next Image ID:                  0x4F424d49		; OBMI next
++Flash Entry Address:            0x00204000		; WTMI flash addr
++Load Address:                   0x1FFF0000		; WTMI RAM addr
++Image Size To CRC in bytes:     0xFFFFFFFF
++Hash Algorithm ID:              32			; SHA-256
++Partition Number:               0x00000000
++Image Filename: WTMI_IMG
+diff --git a/tim/untrusted/secondary/img-2.txt b/tim/untrusted/secondary/img-2.txt
+new file mode 100644
+index 0000000..75fb6f9
+--- /dev/null
++++ b/tim/untrusted/secondary/img-2.txt
+@@ -0,0 +1,8 @@
++Image ID:                       0x4F424d49		; OBMI
++Next Image ID:                  0xFFFFFFFF		; NONE
++Flash Entry Address:            0x00215000		; OBMI flash addr
++Load Address:                   0x64100000		; OBMI RAM addr
++Image Size To CRC in bytes:     0xFFFFFFFF
++Hash Algorithm ID:              32			; SHA-256
++Partition Number:               0x00000000
++Image Filename: BOOT_IMAGE
+diff --git a/tim/untrusted/secondary/readme b/tim/untrusted/secondary/readme
+new file mode 100644
+index 0000000..6385bb5
+--- /dev/null
++++ b/tim/untrusted/secondary/readme
+@@ -0,0 +1,28 @@
++The file tim.txt/img-1.txt/img-2.txt kept in the directory are used to build the secondary flash-image.
++The secondary image is supposed to be burned at SPI flash on its 2Mbyte offset. If the bootROM detects
++the primary image at offset 0x0 on the SPI flash is corrupted, it will try to pick up the secondary boot
++image at the 2Mbyte offset.
++
++To build the secondary image, please replace the tim.txt/img-1.txt/img-2.txt under the directory of
++tools/wtp/untrusted with the ones in this directory and rebuild your flash-image.bin.
++
++To burn the secondary flash-image.bin, you will not be ablel to use the bubt tool which burns the image
++at offset 0x0. Instead please use the sf update command to burn the image:
++
++   1. Load the image to memory
++	tftp 0x2000000 flash-image.bin.secondary
++   2. Burn the image to flash
++	sf probe
++	sf update 0x2000000   0x200000    0x100000
++                    |            |           |
++                  mem addr   spi offset   image size
++
++To confirm the secondary boot image is working fine - just for the testing purpose, you can corrupt
++the first boot image on the SPI by doing:
++
++    sf probe
++    sf erase 0x0 0x100000  ;erase the first 1MB of the SPI flash
++
++Then reboot the system, you'll find the system still boots sucessfully - by picking up the boot image
++at 2MB offset from the SPI flash.
++
+diff --git a/tim/untrusted/secondary/tim.txt b/tim/untrusted/secondary/tim.txt
+new file mode 100644
+index 0000000..786af29
+--- /dev/null
++++ b/tim/untrusted/secondary/tim.txt
+@@ -0,0 +1,8 @@
++Image ID:                       0x54494D48		; TIMH
++Next Image ID:                  0x57544d49		; WTMI next
++Flash Entry Address:            0x00200000		; TIM flash addr
++Load Address:                   0x20006000		; TIM ISRAM addr
++Image Size To CRC in bytes:     0xFFFFFFFF
++Hash Algorithm ID:              32			; SHA-256
++Partition Number:               0x00000000
++Image Filename: TIM_ATF.bin
+-- 
+1.9.1
+

@@ -1,0 +1,96 @@
+From a4569ab493c89002e4af01175dac2951c83b7fee Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Wed, 5 Jul 2017 09:57:51 +0800
+Subject: [PATCH 2/6] buildtim: add argument for build primary or secondary
+ image
+
+Modify the buildtim script to support to build primary or
+secondary flash image.
+---
+ script/buildtim.sh | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/script/buildtim.sh b/script/buildtim.sh
+index 1587961..62d2753 100755
+--- a/script/buildtim.sh
++++ b/script/buildtim.sh
+@@ -9,11 +9,12 @@
+ # $5 - Clocks preset
+ # $6 - DDR topology map
+ # $7 - Partition number
+-# $8 - Enable debug message (1/0)
+-# $9 - Output TIM/NTIM file name
+-# $10 - Output TIMN file name (valid for trusted mode only)
+-# $11 - TIMN CSK sign key file name (valid for trusted mode only)
+-# $12 - Encrypt the image (valid for trusted mode only)
++# $8 - Build primary or secondary image (1/0)
++# $9 - Enable debug message (1/0)
++# $10 - Output TIM/NTIM file name
++# $11 - Output TIMN file name (valid for trusted mode only)
++# $12 - TIMN CSK sign key file name (valid for trusted mode only)
++# $13 - Encrypt the image (valid for trusted mode only)
+ #
+ 
+ DATE=`date +%d%m%Y`
+@@ -23,13 +24,17 @@ CLOCKSPATH=$4
+ PRESET=$5
+ DDRTOPOLOGY=$6
+ BOOTPART=$7
+-DEBUG=$8
+-OUTFILE=$9
++PRIMARY=$8
++DEBUG=$9
++OUTFILE=${10}
+ 
+ # All file names extention
+ FILEEXT="txt"
+ # Image definition files name prefix
+ IMGPREF="img"
++if [ $PRIMARY == "0" ]; then
++	IMGPREF="secondary/img"
++fi
+ # Number of images excepting TIM
+ IMGSNUM=`ls -l $IMGPATH/$IMGPREF*.$FILEEXT | wc -l`
+ # Reserved area definition for TIM/NTIM - file name prefix
+@@ -48,15 +53,18 @@ DLLTUNFILE=$CLOCKSPATH/dll_tune.$FILEEXT
+ 
+ # TIM/NTIM image definition file name prefix
+ TIMPREF="tim"
++if [ $PRIMARY == "0" ]; then
++	TIMPREF="secondary/tim"
++fi
+ # CSK keys file name prefix
+ CSKPREF="csk"
+ # KAK key file name prefix (TIM signature)
+ KAKPREF="kak"
+ 
+ # Below values used only by TIMN
+-TIMNOUTFILE=${10}
+-SIGNFILE=${11}
+-ENCRYPT=${12}
++TIMNOUTFILE=${11}
++SIGNFILE=${12}
++ENCRYPT=${13}
+ # TIMN image definition file name prefix
+ TIMNPREF="timn"
+ # Reserved area definition for TIMN - file name prefix
+@@ -80,7 +88,7 @@ usage () {
+ 	echo "$0 - script for creating TIM/NTIM/TIMN image descriptors"
+ 	echo ""
+ 	echo "$0 <trusted> <boot_device> <files_path> <clocks_path> <clocks_preset> <ddr_topology>"\
+-		" <part_num> <debug> <output> [timN_out] [timN_key]"
++		" <part_num> > <primary> <debug> <output> [timN_out] [timN_key]"
+ 	echo " <trusted>     - trusted/non trusted (supported values 0 and 1)"
+ 	echo " <boot_device> - Boot device (Supported values SPINOR/SPINAND/EMMCNORM/EMMCALT/SATA/UART)"
+ 	echo " <files_path>  - Path to image and keys descriptors text files"
+@@ -88,6 +96,7 @@ usage () {
+ 	echo " <clocks_preset> - Name of clocks preset to use - see \"build.txt\" for details"
+ 	echo " <ddr_topology> - Index of DDR topology map"
+ 	echo " <part_num>    - partition number of the boot device"
++	echo " <primary>     - build for primary or secondary image"
+ 	echo " <debug>       - debug flag to enable TIM DDR package's log"
+ 	echo " <output>      - Output TIM/NTIM file name"
+ 	echo " [timN_out]    - Output TIMN file name (required for trusted boot only)"
+-- 
+1.9.1
+

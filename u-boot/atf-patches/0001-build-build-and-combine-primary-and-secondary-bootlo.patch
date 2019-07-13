@@ -1,0 +1,112 @@
+From a3306abaffc1fa4021ac84869295cf4de16ba835 Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Wed, 5 Jul 2017 14:25:24 +0800
+Subject: [PATCH 1/2] build: build and combine primary and secondary bootloader
+ image
+
+modify Makefile to build secondary bootloader image and combine
+primary and secondary bootloader image to one image (4M).
+
+Signed-off-by: Jason Hung <jhung@globalscaletechnologies.com>
+---
+ Makefile | 56 ++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 48 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5b67763..abe5beb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -139,7 +139,9 @@ endif
+ 
+ # Marvell images
+ BOOT_IMAGE			:= boot-image.bin
+-BOOT_ENC_IMAGE			:= boot-image-enc.bin
++BOOT_ENC_IMAGE		:= boot-image-enc.bin
++FLASH_IMAGE_PRI		:= flash-image-primary.bin
++FLASH_IMAGE_SEC		:= flash-image-secondary.bin
+ FLASH_IMAGE			:= flash-image.bin
+ 
+ ################################################################################
+@@ -499,10 +501,12 @@ PARTNUM			?= 0
+ 
+ TIM_IMAGE		:= $$(grep "Image Filename:" -m 1 $(DOIMAGE_CFG) | cut -c 17-)
+ TIMBLDARGS		:= $(MARVELL_SECURE_BOOT) $(BOOTDEV) $(IMAGESPATH) $(CLOCKSPATH) $(CLOCKSPRESET) \
+-				$(DDR_TOPOLOGY) $(PARTNUM) $(DEBUG) $(DOIMAGE_CFG) $(TIMNCFG) $(TIMNSIG) 1
+-TIMBLDUARTARGS		:= $(MARVELL_SECURE_BOOT) UART $(IMAGESPATH) $(CLOCKSPATH) $(CLOCKSPRESET) \
+-				$(DDR_TOPOLOGY) 0 0 $(DOIMAGE_CFG) $(TIMNCFG) $(TIMNSIG) 0
+-DOIMAGE_FLAGS		:= -r $(DOIMAGE_CFG) -v -D
++				$(DDR_TOPOLOGY) $(PARTNUM) 1 $(DEBUG) $(DOIMAGE_CFG) $(TIMNCFG) $(TIMNSIG) 1
++TIMBLD2ARGS		:= $(MARVELL_SECURE_BOOT) $(BOOTDEV) $(IMAGESPATH) $(CLOCKSPATH) $(CLOCKSPRESET) \
++				$(DDR_TOPOLOGY) $(PARTNUM) 0 $(DEBUG) $(DOIMAGE_CFG) $(TIMNCFG) $(TIMNSIG) 1
++TIMBLDUARTARGS	:= $(MARVELL_SECURE_BOOT) UART $(IMAGESPATH) $(CLOCKSPATH) $(CLOCKSPRESET) \
++				$(DDR_TOPOLOGY) 0 1 0 $(DOIMAGE_CFG) $(TIMNCFG) $(TIMNSIG) 0
++DOIMAGE_FLAGS	:= -r $(DOIMAGE_CFG) -v -D
+ 
+ else # PLAT != a3700
+ #*********** A8K *************
+@@ -849,7 +853,7 @@ endif
+ 	@mv $(subst .bin,_h.bin,$(WTMI_IMG)) $(BUILD_PLAT)/$(BUILD_UART)/wtmi_h.bin
+ 	@tar czf $(BUILD_PLAT)/$(BUILD_UART).tgz -C $(BUILD_PLAT) ./$(BUILD_UART)
+ 	@echo
+-	@echo "Building flash image"
++	@echo "Building primary flash image"
+ 	$(TIMBUILD) $(TIMBLDARGS)
+ 	sed -i 's|WTMI_IMG|$(WTMI_IMG)|1' $(DOIMAGE_CFG)
+ 	sed -i 's|BOOT_IMAGE|$(BUILD_PLAT)/$(BOOT_IMAGE)|1' $(DOIMAGE_CFG)
+@@ -871,15 +875,51 @@ endif
+ 	$(DOIMAGETOOL) $(DOIMAGE_FLAGS)
+ 	@if [ -e "$(TIMNCFG)" ]; then $(DOIMAGETOOL) -r $(TIMNCFG); fi
+ 	@if [ "$(MARVELL_SECURE_BOOT)" = "1" ]; then sed -i 's|$(WTMI_IMG)|$(WTMI_ENC_IMG)|1;s|$(BOOT_IMAGE)|$(BOOT_ENC_IMAGE)|1;' $(TIMNCFG); fi
+-	$(TIM2IMG) $(TIM2IMGARGS) -o $(BUILD_PLAT)/$(FLASH_IMAGE)
++	$(TIM2IMG) $(TIM2IMGARGS) -o $(BUILD_PLAT)/$(FLASH_IMAGE_PRI)
++#	@mv -t $(BUILD_PLAT) $(TIM_IMAGE) $(DOIMAGE_CFG) $(TIMN_IMAGE) $(TIMNCFG) $(WTMI_IMG)
++#	@if [ "$(MARVELL_SECURE_BOOT)" = "1" ]; then mv -t $(BUILD_PLAT) $(WTMI_ENC_IMG) OtpHash.txt; fi
++#	@find . -name "*.txt" | grep -E "CSK[[:alnum:]]_KeyHash.txt|Tim_msg.txt|TIMHash.txt" | xargs rm -f
++	@echo
++	@echo "Building secondary flash image"
++	$(TIMBUILD) $(TIMBLD2ARGS)
++	sed -i 's|WTMI_IMG|$(WTMI_IMG)|1' $(DOIMAGE_CFG)
++	sed -i 's|BOOT_IMAGE|$(BUILD_PLAT)/$(BOOT_IMAGE)|1' $(DOIMAGE_CFG)
++ifeq ($(MARVELL_SECURE_BOOT),1)
++	@sed -i 's|WTMI_IMG|$(WTMI_IMG)|1' $(TIMNCFG)
++	@sed -i 's|BOOT_IMAGE|$(BUILD_PLAT)/$(BOOT_IMAGE)|1' $(TIMNCFG)
++	@echo -e "\n\t=======================================================\n";
++	@echo -e "\t  Secure boot. Encrypting wtmi and boot-image \n";
++	@echo -e "\t=======================================================\n";
++	@truncate -s %16 $(WTMI_IMG)
++	@openssl enc -aes-256-cbc -e -in $(WTMI_IMG) -out $(WTMI_ENC_IMG) \
++	-K `cat $(IMAGESPATH)/aes-256.txt` -k 0 -nosalt \
++	-iv `cat $(IMAGESPATH)/iv.txt` -p
++	@truncate -s %16 $(BUILD_PLAT)/$(BOOT_IMAGE);
++	@openssl enc -aes-256-cbc -e -in $(BUILD_PLAT)/$(BOOT_IMAGE) -out $(BUILD_PLAT)/$(BOOT_ENC_IMAGE) \
++	-K `cat $(IMAGESPATH)/aes-256.txt` -k 0 -nosalt \
++	-iv `cat $(IMAGESPATH)/iv.txt` -p
++endif
++	$(DOIMAGETOOL) $(DOIMAGE_FLAGS)
++	@if [ -e "$(TIMNCFG)" ]; then $(DOIMAGETOOL) -r $(TIMNCFG); fi
++	@if [ "$(MARVELL_SECURE_BOOT)" = "1" ]; then sed -i 's|$(WTMI_IMG)|$(WTMI_ENC_IMG)|1;s|$(BOOT_IMAGE)|$(BOOT_ENC_IMAGE)|1;' $(TIMNCFG); fi
++	$(TIM2IMG) $(TIM2IMGARGS) -o $(BUILD_PLAT)/$(FLASH_IMAGE_SEC)
+ 	@mv -t $(BUILD_PLAT) $(TIM_IMAGE) $(DOIMAGE_CFG) $(TIMN_IMAGE) $(TIMNCFG) $(WTMI_IMG)
+ 	@if [ "$(MARVELL_SECURE_BOOT)" = "1" ]; then mv -t $(BUILD_PLAT) $(WTMI_ENC_IMG) OtpHash.txt; fi
+ 	@find . -name "*.txt" | grep -E "CSK[[:alnum:]]_KeyHash.txt|Tim_msg.txt|TIMHash.txt" | xargs rm -f
++	@echo
++	@echo "Combine primary and secondary image"
++	@cp ${BUILD_PLAT}/${FLASH_IMAGE_PRI} ${BUILD_PLAT}/primary.img
++	@cp ${BUILD_PLAT}/${FLASH_IMAGE_SEC} ${BUILD_PLAT}/secondary.img
++	@truncate -s 2M ${BUILD_PLAT}/primary.img
++	@truncate -s 2M ${BUILD_PLAT}/secondary.img
++	@cat ${BUILD_PLAT}/primary.img ${BUILD_PLAT}/secondary.img > ${BUILD_PLAT}/${FLASH_IMAGE}
++	@echo "Output combine image: ${BUILD_PLAT}/${FLASH_IMAGE}"
++	@rm ${BUILD_PLAT}/primary.img ${BUILD_PLAT}/secondary.img
+ else
+ fip: ${BUILD_PLAT}/${FIP_NAME} ${DOIMAGETOOL} ${BUILD_PLAT}/ble.bin
+ 	$(shell truncate -s %128K ${BUILD_PLAT}/bl1.bin)
+ 	$(shell cat ${BUILD_PLAT}/bl1.bin ${BUILD_PLAT}/${FIP_NAME} > ${BUILD_PLAT}/${BOOT_IMAGE})
+-	${DOIMAGETOOL} ${DOIMAGE_FLAGS} ${BUILD_PLAT}/${BOOT_IMAGE} ${BUILD_PLAT}/${FLASH_IMAGE}
++	${DOIMAGETOOL} ${DOIMAGE_FLAGS} ${BUILD_PLAT}/${BOOT_IMAGE} ${BUILD_PLAT}/${FLASH_IMAGE_PRI}
+ endif
+ else
+ fip: ${BUILD_PLAT}/${FIP_NAME}
+-- 
+1.9.1
+

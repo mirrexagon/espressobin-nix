@@ -1,0 +1,23 @@
+From fe7b9f2e175c3b179d4d227554e76380e37a3473 Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Mon, 20 Nov 2017 09:03:52 +0800
+Subject: [PATCH 3/6] git: add clocks_ddr.txt to git ignore list
+
+add clocks_ddr.txt temporary file to git ignore list
+---
+ .gitignore | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index 7abe62e..12ac289 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -8,4 +8,4 @@ wtmi/build/*
+ #ignore specific files
+ ddr_static.txt
+ autoconf.h
+-
++clocks_ddr.txt
+-- 
+1.9.1
+

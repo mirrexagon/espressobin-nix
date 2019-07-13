@@ -1,0 +1,24 @@
+From 873a9ac58636ce4eca827cfe224e14b3cbaebec0 Mon Sep 17 00:00:00 2001
+From: Jason Hung <jhung@globalscaletechnologies.com>
+Date: Tue, 15 May 2018 13:54:54 +0800
+Subject: [PATCH 5/6] add .d files to gitignore
+
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.gitignore b/.gitignore
+index 12ac289..2b90078 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,6 +5,7 @@ wtmi/build/*
+ *.elf
+ *.dis
+ *.bin
++*.d
+ #ignore specific files
+ ddr_static.txt
+ autoconf.h
+-- 
+1.9.1
+
