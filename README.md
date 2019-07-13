@@ -1,6 +1,9 @@
 # NixOS on the Marvell ESPRESSObin
 http://espressobin.net/
 
+## My board
+I have an V7 1GB board.
+
 ## Resources
 Bootloader build instructions.
 http://wiki.espressobin.net/tiki-index.php?page=Build+From+Source+-+Bootloader
