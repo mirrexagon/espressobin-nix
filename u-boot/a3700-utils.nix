@@ -9,7 +9,7 @@ stdenv.mkDerivation {
     owner = "mirrexagon";
     repo = "A3700-utils-marvell";
     rev = "mrxgn-espressobin-v7";
-    sha256 = "0mjhx7vzym75in114j4g6xvnfazli0b2h4x0gfpf8rwcxdj1wd6f";
+    sha256 = "0cjqf4p1gnm48la2rh09hdgmki8lf5x42dbd1jpb19334yc2m8x6";
   };
 
   # patches = [
