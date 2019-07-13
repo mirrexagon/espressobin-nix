@@ -30,13 +30,22 @@ stdenv.mkDerivation {
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
       --replace "/bin/cp" "cp"
 
+    # This Makefile seems to have the wrong number of arguments to buildtim.sh.
+    substituteInPlace atf-marvell/Makefile \
+      --replace "0 0" "0 0 1"
+
     # There are some binary tools in there that we have to patch.
     # Since we're cross-compiling on x86-86 to aarch64, we need to use the host's
     # CC to get the interpreter (can't use NIX_CC because its aarch64).
+
+    # I thought these were needed, but actually they aren't.
+    # ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+    #   A3700-utils-marvell/ddr/tim_ddr/ddr3_tool
+    # ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+    #   A3700-utils-marvell/ddr/tim_ddr/ddr4_tool
+
     ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      A3700-utils-marvell/ddr/tim_ddr/ddr3_tool
-    ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      A3700-utils-marvell/ddr/tim_ddr/ddr4_tool
+      A3700-utils-marvell/wtptp/linux/TBB_linux
 
     cd atf-marvell
 
