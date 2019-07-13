@@ -25,8 +25,10 @@ stdenv.mkDerivation {
     patchShebangs A3700-utils-marvell
 
     # But a Perl script doesn't get patched.
+    # Also it assumes cp is in /bin/cp, which is wrong on NixOS.
     substituteInPlace A3700-utils-marvell/ddr/tim_ddr/ddrparser.pl \
-      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
+      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
+      --replace "/bin/cp" "cp"
 
     # There are some binary tools in there that we have to patch.
     # Since we're cross-compiling on x86-86 to aarch64, we need to use the host's
