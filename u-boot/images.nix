@@ -46,7 +46,7 @@ stdenv.mkDerivation {
 
     ${buildPackages.patchelf}/bin/patchelf \
       --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib/libstdc++.so.6" \
+      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
       A3700-utils-marvell/wtptp/linux/TBB_linux
 
     cd atf-marvell
