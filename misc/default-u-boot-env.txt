@@ -1,0 +1,35 @@
+baudrate=115200
+bootcmd=mmc dev 0; ext4load mmc 0:1 $kernel_addr $image_name;ext4load mmc 0:1 $fdt_addr $fdt_name;setenv bootargs $console root=/dev/mmcblk0p1 rw rootwait net.ifnames=0 biosdevname=0; booti $kernel_addr - $fdt_addr
+bootdelay=2
+console=console=ttyMV0,115200 earlycon=ar3700_uart,0xd0012000
+eth1addr=00:51:82:11:22:01
+eth2addr=00:51:82:11:22:02
+eth3addr=00:51:82:11:22:03
+ethact=neta@30000
+ethaddr=F0:AD:4E:09:08:A0
+ethprime=eth0
+fdt_addr=0x4f00000
+fdt_high=0xffffffffffffffff
+fdt_name=boot/armada-3720-community-v7.dtb
+fdtcontroladdr=3f7161b8
+gatewayip=10.4.50.254
+get_images=tftpboot $kernel_addr $image_name; tftpboot $fdt_addr $fdt_name; run get_ramfs
+get_ramfs=if test "${ramfs_name}" != "-"; then setenv ramfs_addr 0x8000000; tftpboot $ramfs_addr $ramfs_name; else setenv ramfs_addr -;fi
+hostname=marvell
+image_name=boot/Image
+initrd_addr=0xa00000
+initrd_size=0x2000000
+ipaddr=0.0.0.0
+kernel_addr=0x5000000
+loadaddr=0x5000000
+netdev=eth0
+netmask=255.255.255.0
+ramfs_addr=0x8000000
+ramfs_name=-
+root=root=/dev/nfs rw
+rootpath=/srv/nfs/
+serverip=0.0.0.0
+set_bootargs=setenv bootargs $console $root ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:$netdev:none nfsroot=$serverip:$rootpath $extra_params
+stderr=serial@12000
+stdin=serial@12000
+stdout=serial@12000
