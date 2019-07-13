@@ -26,7 +26,7 @@ stdenv.mkDerivation {
 
     export CROSS_COMPILE=aarch64-unknown-linux-gnu-
 
-    # Can't link bl1 without this.
+    # Can't link something without this.
     export CFLAGS=-fno-stack-protector
 
     # Needed to build WTMI binary, see
