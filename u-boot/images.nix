@@ -44,7 +44,9 @@ stdenv.mkDerivation {
     # ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
     #   A3700-utils-marvell/ddr/tim_ddr/ddr4_tool
 
-    ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+    ${buildPackages.patchelf}/bin/patchelf \
+      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib/libstdc++.so.6" \
       A3700-utils-marvell/wtptp/linux/TBB_linux
 
     cd atf-marvell
