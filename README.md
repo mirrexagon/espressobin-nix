@@ -14,4 +14,4 @@ Hacky way to build: link u-boot as an overlay, then run `nix build -f channel:ni
 - Implies upstream U-Boot supports Espressobin, maybe they mean Marvell's fork does (and maybe only v5): http://espressobin.net/forums/topic/how-to-flash-u-boot/
 - An issue about adding distro config support to Marvell's U-boot fork: https://github.com/MarvellEmbeddedProcessors/u-boot-marvell/issues/3
 - A poor single mailing list post about trying to make upstream U-Boot work (mentioned in a comment in the previous link): https://lists.denx.de/pipermail/u-boot/2018-August/339362.html
-- Someone trying newer U-boot, includes build command: https://lists.denx.de/pipermail/u-boot//2017-July/298761.html
+- Someone trying newer U-boot, includes build command: https://github.com/MarvellEmbeddedProcessors/atf-marvell/issues/12
