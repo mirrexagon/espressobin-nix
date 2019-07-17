@@ -16,3 +16,5 @@ Hacky way to build: link u-boot as an overlay, then run `nix build -f channel:ni
 - A poor single mailing list post about trying to make upstream U-Boot work (mentioned in a comment in the previous link): https://lists.denx.de/pipermail/u-boot/2018-August/339362.html
 - Someone trying newer U-boot, includes build command: https://github.com/MarvellEmbeddedProcessors/atf-marvell/issues/12
 - Someone's step-by-step build process: https://lists.denx.de/pipermail/u-boot//2017-July/298761.html
+- MACCHIATObin U-boot build instructions, which seem to use the newer build process with mv-ddr-marvell: http://wiki.macchiatobin.net/tiki-index.php?page=Build+from+source+-+Bootloader
+- Someone saying those instructions don't work and a fix: https://macchiatobin.net/forums/topic/u-boot-build-instruction-do-not-lead-to-usable-image/
