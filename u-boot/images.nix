@@ -65,13 +65,14 @@ in stdenv.mkDerivation {
 
     cd atf-marvell
 
+    # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
     make \
       DEBUG=1 \
       USE_COHERENT_MEM=0 \
       LOG_LEVEL=50 \
       SECURE=0 \
       CLOCKSPRESET=CPU_1000_DDR_800 \
-      DDR_TOPOLOGY=2 \
+      DDR_TOPOLOGY=5 \
       BOOTDEV=SPINOR \
       PARTNUM=0 \
       PLAT=a3700 \
