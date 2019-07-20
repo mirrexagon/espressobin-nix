@@ -76,7 +76,7 @@ in stdenv.mkDerivation {
     make \
       DEBUG=1 \
       USE_COHERENT_MEM=0 \
-      LOG_LEVEL=20 \
+      LOG_LEVEL=50 \
       SECURE=0 \
       CLOCKSPRESET=CPU_1000_DDR_800 \
       DDR_TOPOLOGY=5 \
@@ -92,8 +92,7 @@ in stdenv.mkDerivation {
 
   installPhase = ''
     mkdir $out
-    ls atf-marvell/build/a3700/debug
-    cp -r atf-marvell/build/a3700/debug/{flash-image.bin,uart-images.tgz} $out
+    cp -r atf-marvell/build/a3700/debug/{flash-image.bin,uart-images} $out
 
     mkdir $out/bin
     cp A3700-utils-marvell/wtptp/linux/WtpDownload_linux $out/bin
