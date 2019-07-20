@@ -25,7 +25,8 @@ let
     sha256 = "1zj4xg6cmlq13yy2h68z4jxsq6vr7wz5ljm15f26g3cawq7545xq";
   };
 in stdenv.mkDerivation {
-  name = "espressobin-u-boot-images";
+  name = "espressobin-u-boot-images-${version}";
+  version = "armada-18.12";
 
   phases = [ "buildPhase" "installPhase" ];
 
