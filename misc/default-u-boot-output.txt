@@ -1,0 +1,54 @@
+TIM-1.0
+WTMI-armada-17.10.5-bb8f823
+WTMI: system early-init
+SVC REV: 5, CPU VDD voltage: 1.132V
+
+Fill memory before self refresh...done
+
+Now in Self-refresh Mode
+Exited self-refresh ...
+
+
+Self refresh Pass.
+DDR self test mode test done!!
+Vref read training
+===================
+Final vdac_value 0x0000001F
+
+Vref write training
+===================
+Final vref_value 0x0000001F
+
+DLL TUNING
+==============
+   DLL 0xc0001050[21:16]: [5,30,1a]
+   DLL 0xc0001050[29:24]: [7,2a,18]
+   DLL 0xc0001054[21:16]: [5,29,17]
+   DLL 0xc0001054[29:24]: [c,2d,1c]
+   DLL 0xc0001074[21:16]: [0,3f,1f]
+   DLL 0xc0001074NOTICE:  Booting Trusted Firmware
+NOTICE:  BL1: v1.3(release):armada-17.10.3:39a62a1
+NOTICE:  BL1: Built : 15:40:57, Jun  1 2NOTICE:  BL2: v1.3(release):armada-17.10.3:39a62a1
+NOTICE:  BL2: Built : 15:40:59, Jun  1 2018NOTICE:  BL31: v1.3(release):armada-17.10.3:39a62a1
+NOTICE:  BL31:
+
+U-Boot 2017.03-armada-17.10.2-g14aeedc (Jun 01 2018 - 15:39:10 +0800)
+
+Model: Marvell Armada 3720 Community Board ESPRESSOBin
+       CPU    @ 1000 [MHz]
+       L2     @ 800 [MHz]
+       TClock @ 200 [MHz]
+       DDR    @ 800 [MHz]
+DRAM:  1 GiB
+U-Boot DT blob at : 000000003f7161b8
+Comphy-0: USB3          5 Gbps
+Comphy-1: PEX0          2.5 Gbps
+Comphy-2: SATA0         6 Gbps
+SATA link 0 timeout.
+AHCI 0001.0300 32 slots 1 ports 6 Gbps 0x1 impl SATA mode
+flags: ncq led only pmp fbss pio slum part sxs
+PCIE-0: Link down
+MMC:   sdhci@d0000: 0, sdhci@d8000: 1
+SF: Detected mx25u3235f with page size 256 Bytes, erase size 64 KiB, total 4 MiB
+Net:   eth0: neta@30000 [PRIME]
+Hit any key to stop autoboot:  0
