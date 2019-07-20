@@ -32,7 +32,8 @@ in stdenv.mkDerivation {
     buildPackages.which
   ];
 
-  # Build instructions from https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/80316c829d0c56b67eb60c39fe3fd6266b314860/docs/marvell/build.txt
+  # Build instructions sort of used from
+  # https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/80316c829d0c56b67eb60c39fe3fd6266b314860/docs/marvell/build.txt
   buildPhase = ''
     export CROSS_COMPILE=aarch64-unknown-linux-gnu-
     export BL33=${ubootEspressobin}/u-boot.bin
@@ -63,7 +64,13 @@ in stdenv.mkDerivation {
       --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
       A3700-utils-marvell/wtptp/linux/tbb_linux
 
-    cd atf-marvell
+    # UART downloader tool.
+    ${buildPackages.patchelf}/bin/patchelf \
+      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
+      A3700-utils-marvell/wtptp/linux/WtpDownload_linux
+
+    pushd atf-marvell
 
     # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
     make \
@@ -79,11 +86,15 @@ in stdenv.mkDerivation {
       WTP=$(pwd)/../A3700-utils-marvell \
       MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
       all fip
+    popd
   '';
 
   installPhase = ''
-    mkdir -p $out
-    cp -r build/a3700/debug/flash-image.bin $out
+    mkdir $out
+    cp -r atf-marvell/build/a3700/debug/flash-image.bin $out
+
+    mkdir $out/bin
+    cp A3700-utils-marvell/wtptp/linux/WtpDownload_linux $out/bin
   '';
 
   meta = with stdenv.lib; {
