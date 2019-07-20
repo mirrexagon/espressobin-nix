@@ -16,7 +16,7 @@ The Armbian project has [built U-Boot 18.03 images](https://dl.armbian.com/espre
 - Armbian forums on A3xx devices, including the ESPRESSObin: https://forum.armbian.com/forum/32-armada-a388-a3700/
 
 ## Hardware notes
-- The V7 schematics imply you can boot U-Boot from SD card by setting the three mode jumpers to 1. The [wiki page](http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces) table seems to be wrong, all modes except SPI NOR flash are the same.
+- The V7 schematics (page 9) imply you can boot U-Boot from SD card by setting the three mode jumpers to 1. The [wiki page](http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces) table seems to be wrong, all modes except SPI NOR flash are the same.
 
 ## TODO
 - Disable Topaz switch on boot, so it doesn't forward packets before Linux starts: http://espressobin.net/forums/topic/are-lan0-and-lan1-bridged-in-hardware/
