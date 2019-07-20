@@ -4,6 +4,8 @@ http://espressobin.net/
 ## My board
 I have an V7 1GB board.
 
+It boots with the stock `espressobin-bootloader-cpu-1000-ddr4-1cs-1g-atf-g39a62a1-uboot-g255b9cc-20181107-REL.bin`
+
 ## U-boot
 Hacky way to build: link u-boot as an overlay, then run `nix build -f channel:nixos-unstable pkgsCross.aarch64-multiplatform.ubootEspressobinImages`.
 
