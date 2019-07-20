@@ -64,14 +64,14 @@ in stdenv.mkDerivation rec {
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
 
     # There are some tools we can build, one of which we need in the build.
+    # There are already checked-in binaries, but let's not use them.
     pushd A3700-utils-marvell/wtptp/src/TBB_Linux >/dev/null
       make -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
-      cp release/TBB_linux ../../linux
+      cp release/TBB_linux ../../linux/tbb_linux
     popd >/dev/null
 
     pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
       make -f makefile.mk
-      ./WtpDownload_linux
       cp WtpDownload_linux ../../linux
     popd >/dev/null
 
@@ -105,6 +105,7 @@ in stdenv.mkDerivation rec {
 
   meta = with stdenv.lib; {
     maintainers = [ maintainers.mirrexagon ];
+
     # platforms = [ "aarch64-linux" ];
 
     # TODO: Figure out if this should be something more free.
