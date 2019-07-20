@@ -24,15 +24,20 @@ stdenv.mkDerivation {
     # A3700-utils has some scripts it wants to run.
     patchShebangs A3700-utils-marvell
 
-    # But a Perl script doesn't get patched.
-    # Also it assumes cp is in /bin/cp, which is wrong on NixOS.
+    # But Perl scripts don't get patched.
+    # Also one assumes cp is in /bin/cp, which is wrong on NixOS.
     substituteInPlace A3700-utils-marvell/ddr/tim_ddr/ddrparser.pl \
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
       --replace "/bin/cp" "cp"
 
-    # This Makefile seems to have the wrong number of arguments to buildtim.sh.
+    substituteInPlace A3700-utils-marvell/script/tim2img.pl \
+      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
+
+    # This Makefile seems to have the wrong number of arguments to buildtim.sh
+    # Either BOOTPART or PRIMARY is missing. I'm assuming both are just 0.
     substituteInPlace atf-marvell/Makefile \
-      --replace "0 0" "0 0 1"
+      --replace "0 0" "0 0 0" \
+      --replace "\$(PARTNUM)" "\$(PARTNUM) 0"
 
     # There are some binary tools in there that we have to patch.
     # Since we're cross-compiling on x86-86 to aarch64, we need to use the host's
