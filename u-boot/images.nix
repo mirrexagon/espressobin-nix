@@ -106,7 +106,9 @@ in stdenv.mkDerivation rec {
   meta = with stdenv.lib; {
     maintainers = [ maintainers.mirrexagon ];
 
-    # platforms = [ "aarch64-linux" ];
+    # TODO: Expects to be cross-compiled, given we set the CROSS_COMPILE variable.
+    # Also uses 32-bit ARM gcc. What should the platforms be?
+    platforms = [ "aarch64-linux" ];
 
     # TODO: Figure out if this should be something more free.
     license = licenses.unfreeRedistributableFirmware;
