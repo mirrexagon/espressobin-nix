@@ -34,6 +34,7 @@ in stdenv.mkDerivation rec {
     buildPackages.stdenv.cc
     buildPackages.openssl
     buildPackages.which
+    buildPackages.cryptopp
   ];
 
   # Build instructions sort of used from
@@ -55,23 +56,24 @@ in stdenv.mkDerivation rec {
     cp -r ${mv-ddr-marvell} mv-ddr-marvell
     chmod -R 755 atf-marvell A3700-utils-marvell mv-ddr-marvell
 
-    # A3700-utils has some scripts it wants to run.
+    # A3700-utils has some scripts the build process will run.
     patchShebangs A3700-utils-marvell
 
     # But Perl scripts don't get patched, so we do it manually.
     substituteInPlace A3700-utils-marvell/script/tim2img.pl \
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
 
-    # We need this binary to build something.
-    patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
-      A3700-utils-marvell/wtptp/linux/tbb_linux
+    # There are some tools we can build, one of which we need in the build.
+    pushd A3700-utils-marvell/wtptp/src/TBB_Linux >/dev/null
+      make -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
+      cp release/TBB_linux ../../linux
+    popd >/dev/null
 
-    # UART downloader tool.
-    ${buildPackages.patchelf}/bin/patchelf \
-      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
-      A3700-utils-marvell/wtptp/linux/WtpDownload_linux
+    pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
+      make -f makefile.mk
+      ./WtpDownload_linux
+      cp WtpDownload_linux ../../linux
+    popd >/dev/null
 
     pushd atf-marvell >/dev/null
 
