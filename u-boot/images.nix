@@ -1,8 +1,27 @@
-# Needs to be built on x86-64 host, due to some build tools being checked-in x86-64 binaries...
+{ stdenv, fetchFromGitHub, ubootEspressobin, buildPackages }:
 
-{ stdenv, ubootEspressobin, armTrustedFirmwareEspressobin, a3700UtilsEspressobin, buildPackages }:
+let
+  atf-marvell = fetchFromGitHub {
+    owner = "MarvellEmbeddedProcessors";
+    repo = "atf-marvell";
+    rev = "atf-v1.5-armada-18.12";
+    sha256 = "1ldiak6x7agdfqkx0x8zz96653kg9pjsahjnxl3159xa66b4fn2l";
+  };
 
-stdenv.mkDerivation {
+  a3700-utils-marvell = fetchFromGitHub {
+    owner = "MarvellEmbeddedProcessors";
+    repo = "A3700-utils-marvell";
+    rev = "A3700_utils-armada-18.12";
+    sha256 = "1z783ycy8h3vvlr5w5vi39fk608ljnik647ipj0s4z8klqllpyan";
+  };
+
+  mv-ddr-marvell = fetchFromGitHub {
+    owner = "MarvellEmbeddedProcessors";
+    repo = "mv-ddr-marvell";
+    rev = "mv_ddr-armada-18.12";
+    sha256 = "1zj4xg6cmlq13yy2h68z4jxsq6vr7wz5ljm15f26g3cawq7545xq";
+  };
+in stdenv.mkDerivation {
   name = "espressobin-u-boot-images";
 
   phases = [ "buildPhase" "installPhase" ];
@@ -13,65 +32,57 @@ stdenv.mkDerivation {
     buildPackages.which
   ];
 
+  # Build instructions from https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/80316c829d0c56b67eb60c39fe3fd6266b314860/docs/marvell/build.txt
   buildPhase = ''
-    export BL33=${ubootEspressobin}/u-boot.bin
-
-    cp -r ${armTrustedFirmwareEspressobin} atf-marvell
-    cp -r ${a3700UtilsEspressobin} A3700-utils-marvell
-
-    chmod -R 755 atf-marvell A3700-utils-marvell
-
-    # A3700-utils has some scripts it wants to run.
-    patchShebangs A3700-utils-marvell
-
-    # But Perl scripts don't get patched.
-    # Also one assumes cp is in /bin/cp, which is wrong on NixOS.
-    substituteInPlace A3700-utils-marvell/ddr/tim_ddr/ddrparser.pl \
-      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
-      --replace "/bin/cp" "cp"
-
-    substituteInPlace A3700-utils-marvell/script/tim2img.pl \
-      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl" \
-
-    # This Makefile seems to have the wrong number of arguments to buildtim.sh
-    # Either BOOTPART or PRIMARY is missing. I'm assuming both are just 0.
-    substituteInPlace atf-marvell/Makefile \
-      --replace "0 0" "0 0 0" \
-      --replace "\$(PARTNUM)" "\$(PARTNUM) 0"
-
-    # There are some binary tools in there that we have to patch.
-    # Since we're cross-compiling on x86-86 to aarch64, we need to use the host's
-    # CC to get the interpreter (can't use NIX_CC because its aarch64).
-
-    # I thought these were needed, but actually they aren't.
-    # ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-    #   A3700-utils-marvell/ddr/tim_ddr/ddr3_tool
-    # ${buildPackages.patchelf}/bin/patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-    #   A3700-utils-marvell/ddr/tim_ddr/ddr4_tool
-
-    ${buildPackages.patchelf}/bin/patchelf \
-      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
-      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
-      A3700-utils-marvell/wtptp/linux/TBB_linux
-
-    cd atf-marvell
-
     export CROSS_COMPILE=aarch64-unknown-linux-gnu-
+    export BL33=${ubootEspressobin}/u-boot.bin
 
     # Can't link something without this.
     export CFLAGS=-fno-stack-protector
 
-    # Needed to build WTMI binary, see
-    # http://wiki.espressobin.net/tiki-index.php?page=Build+From+Source+-+Bootloader#Build_U-Boot
+    # Needed to build WTMI binary.
     export CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi-
 
-    # SPINOR ESPRESSObin DDR4 1CS 1GB
-    make DEBUG=1 USE_COHERENT_MEM=0 LOG_LEVEL=20 SECURE=0 CLOCKSPRESET=CPU_1000_DDR_800 DDR_TOPOLOGY=5 BOOTDEV=SPINOR PARTNUM=0 WTP=../A3700-utils-marvell PLAT=a3700 all fip
+    # The build process modifies these directories so we make copies of them
+    # and make them writable.
+    cp -r ${atf-marvell} atf-marvell
+    cp -r ${a3700-utils-marvell} A3700-utils-marvell
+    cp -r ${mv-ddr-marvell} mv-ddr-marvell
+    chmod -R 755 atf-marvell A3700-utils-marvell mv-ddr-marvell
+
+    # A3700-utils has some scripts it wants to run.
+    patchShebangs A3700-utils-marvell
+
+    # But Perl scripts don't get patched, so we do it manually.
+    substituteInPlace A3700-utils-marvell/script/tim2img.pl \
+      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
+
+    # We need this binary to build something.
+    ${buildPackages.patchelf}/bin/patchelf \
+      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+      --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
+      A3700-utils-marvell/wtptp/linux/tbb_linux
+
+    cd atf-marvell
+
+    make \
+      DEBUG=1 \
+      USE_COHERENT_MEM=0 \
+      LOG_LEVEL=50 \
+      SECURE=0 \
+      CLOCKSPRESET=CPU_1000_DDR_800 \
+      DDR_TOPOLOGY=2 \
+      BOOTDEV=SPINOR \
+      PARTNUM=0 \
+      PLAT=a3700 \
+      WTP=$(pwd)/../A3700-utils-marvell \
+      MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
+      all fip
   '';
 
   installPhase = ''
     mkdir -p $out
-    cp -r build/a3700/debug/{flash-image.bin,uart-images} $out
+    cp -r build/a3700/debug/flash-image.bin $out
   '';
 
   meta = with stdenv.lib; {

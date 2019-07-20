@@ -7,9 +7,10 @@ I have an V7 1GB board.
 It boots with the stock `espressobin-bootloader-cpu-1000-ddr4-1cs-1g-atf-g39a62a1-uboot-g255b9cc-20181107-REL.bin`
 
 ## U-boot
-Hacky way to build: link u-boot as an overlay, then run `nix build -f channel:nixos-unstable pkgsCross.aarch64-multiplatform.ubootEspressobinImages`.
+Build with `nix-build release.nix -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages`.
 
-The Armbian project has built U-Boot 18.03 images: https://dl.armbian.com/espressobin/u-boot/
+### Notes
+The Armbian project has [built U-Boot 18.03 images](https://dl.armbian.com/espressobin/u-boot/), but they don't seem to be set up for distro boot config/extlinux.
 
 ### Links
 - Bootloader build instructions: http://wiki.espressobin.net/tiki-index.php?page=Build+From+Source+-+Bootloader
