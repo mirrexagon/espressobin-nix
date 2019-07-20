@@ -63,8 +63,7 @@ in stdenv.mkDerivation {
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
 
     # We need this binary to build something.
-    ${buildPackages.patchelf}/bin/patchelf \
-      --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
+    patchelf --set-interpreter $(cat ${buildPackages.stdenv.cc}/nix-support/dynamic-linker) \
       --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
       A3700-utils-marvell/wtptp/linux/tbb_linux
 
