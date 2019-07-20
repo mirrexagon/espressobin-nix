@@ -2,7 +2,7 @@
 
 let
   atf-marvell = fetchFromGitHub {
-    # License: BSD 3-clause
+    # License: BSD 3-clause for original ATF, Marvell parts GPL2 or later
     owner = "MarvellEmbeddedProcessors";
     repo = "atf-marvell";
     rev = "atf-v1.5-armada-18.12";
@@ -73,7 +73,7 @@ in stdenv.mkDerivation {
       --set-rpath "${buildPackages.stdenv.cc.cc.lib}/lib" \
       A3700-utils-marvell/wtptp/linux/WtpDownload_linux
 
-    pushd atf-marvell
+    pushd atf-marvell >/dev/null
 
     # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
     make \
@@ -90,7 +90,7 @@ in stdenv.mkDerivation {
       MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
       all fip
 
-    popd
+    popd >/dev/null
   '';
 
   installPhase = ''
@@ -103,7 +103,9 @@ in stdenv.mkDerivation {
 
   meta = with stdenv.lib; {
     maintainers = [ maintainers.mirrexagon ];
-    # ?
+    # platforms = [ "aarch64-linux" ];
+
+    # TODO: Figure out if this should be something more free.
     license = licenses.unfreeRedistributableFirmware;
   };
 }
