@@ -22,3 +22,4 @@ The Armbian project has built U-Boot 18.03 images: https://dl.armbian.com/espres
 - Someone's step-by-step build process: https://lists.denx.de/pipermail/u-boot//2017-July/298761.html
 - MACCHIATObin U-boot build instructions, which seem to use the newer build process with mv-ddr-marvell: http://wiki.macchiatobin.net/tiki-index.php?page=Build+from+source+-+Bootloader
 - Someone saying those instructions don't work and a fix: https://macchiatobin.net/forums/topic/u-boot-build-instruction-do-not-lead-to-usable-image/
+- Armbian, 18.12 release Marvell stuff: https://forum.armbian.com/topic/9142-marvell-issued-armada-lsp-release-1812-to-general-public/
