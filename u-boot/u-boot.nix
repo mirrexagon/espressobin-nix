@@ -11,6 +11,10 @@ buildUBoot rec {
     sha256 = "0g7nry9zpjxdk9dclvwkq64719cdfmcj22ybv6lhfqm7d0xqgpkn";
   };
 
+  extraPatches = [
+    ./0001-Enable-distro-boot-config.patch
+  ];
+
   extraMakeFlags = [ "DEVICE_TREE=armada-3720-espressobin" ];
 
   defconfig = "mvebu_espressobin-88f3720_defconfig";

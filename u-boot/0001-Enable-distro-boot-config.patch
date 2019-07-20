@@ -1,0 +1,27 @@
+From 67dfa7c5c5760910a67c5840c293977045daa0c1 Mon Sep 17 00:00:00 2001
+From: Andrew Abbott <mirrexagon@mirrexagon.com>
+Date: Sun, 21 Jul 2019 09:28:30 +1000
+Subject: [PATCH] Enable distro boot config
+
+---
+ include/configs/mvebu_armada-37xx.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/configs/mvebu_armada-37xx.h b/include/configs/mvebu_armada-37xx.h
+index cf8a77a414..852c7898ba 100644
+--- a/include/configs/mvebu_armada-37xx.h
++++ b/include/configs/mvebu_armada-37xx.h
+@@ -12,6 +12,10 @@
+ 
+ #include <configs/mvebu_armada-common.h>
+ 
++#ifndef CONFIG_SPL_BUILD
++#include <config_distro_bootcmd.h>
++#endif
++
+ /*
+  * High Level Configuration Options (easy to change)
+  */
+-- 
+2.22.0
+
