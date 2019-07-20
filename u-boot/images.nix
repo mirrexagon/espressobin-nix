@@ -24,7 +24,7 @@ let
     rev = "mv_ddr-armada-18.12";
     sha256 = "1zj4xg6cmlq13yy2h68z4jxsq6vr7wz5ljm15f26g3cawq7545xq";
   };
-in stdenv.mkDerivation {
+in stdenv.mkDerivation rec {
   name = "espressobin-u-boot-images-${version}";
   version = "armada-18.12";
 
