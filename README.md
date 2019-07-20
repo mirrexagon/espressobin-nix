@@ -9,6 +9,8 @@ It boots with the stock `espressobin-bootloader-cpu-1000-ddr4-1cs-1g-atf-g39a62a
 ## U-boot
 Hacky way to build: link u-boot as an overlay, then run `nix build -f channel:nixos-unstable pkgsCross.aarch64-multiplatform.ubootEspressobinImages`.
 
+The Armbian project has built U-Boot 18.03 images: https://dl.armbian.com/espressobin/u-boot/
+
 ### Links
 - Bootloader build instructions: http://wiki.espressobin.net/tiki-index.php?page=Build+From+Source+-+Bootloader
 - Forum post about building and flashing U-boot: http://espressobin.net/forums/topic/how-to-flash-u-boot/
