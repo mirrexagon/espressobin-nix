@@ -21,7 +21,6 @@ buildUBoot rec {
   extraMeta = with lib; {
     maintainers = [ maintainers.mirrexagon ];
     platforms = [ "aarch64-linux" ];
-    # ?
-    license = licenses.unfreeRedistributableFirmware;
+    license = licenses.gpl2;
   };
 }

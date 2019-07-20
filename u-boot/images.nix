@@ -2,6 +2,7 @@
 
 let
   atf-marvell = fetchFromGitHub {
+    # License: BSD 3-clause
     owner = "MarvellEmbeddedProcessors";
     repo = "atf-marvell";
     rev = "atf-v1.5-armada-18.12";
@@ -9,6 +10,7 @@ let
   };
 
   a3700-utils-marvell = fetchFromGitHub {
+    # License: BSD 3-clause
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
     rev = "A3700_utils-armada-18.12";
@@ -16,6 +18,7 @@ let
   };
 
   mv-ddr-marvell = fetchFromGitHub {
+    # License: GPL 2 or later
     owner = "MarvellEmbeddedProcessors";
     repo = "mv-ddr-marvell";
     rev = "mv_ddr-armada-18.12";
