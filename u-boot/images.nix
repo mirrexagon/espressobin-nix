@@ -40,15 +40,6 @@ in stdenv.mkDerivation rec {
   # Build instructions sort of used from
   # https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/80316c829d0c56b67eb60c39fe3fd6266b314860/docs/marvell/build.txt
   buildPhase = ''
-    export CROSS_COMPILE=aarch64-unknown-linux-gnu-
-    export BL33=${ubootEspressobin}/u-boot.bin
-
-    # Can't link something without this.
-    export CFLAGS=-fno-stack-protector
-
-    # Needed to build WTMI binary.
-    export CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi-
-
     # The build process modifies these directories so we make copies of them
     # and make them writable.
     cp -r ${atf-marvell} atf-marvell
@@ -75,23 +66,31 @@ in stdenv.mkDerivation rec {
       cp WtpDownload_linux ../../linux
     popd >/dev/null
 
+    # Now for the actual boot image build.
     pushd atf-marvell >/dev/null
+      export CROSS_COMPILE=aarch64-unknown-linux-gnu-
+      export BL33=${ubootEspressobin}/u-boot.bin
 
-    # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
-    make \
-      DEBUG=1 \
-      USE_COHERENT_MEM=0 \
-      LOG_LEVEL=50 \
-      SECURE=0 \
-      CLOCKSPRESET=CPU_1000_DDR_800 \
-      DDR_TOPOLOGY=5 \
-      BOOTDEV=SPINOR \
-      PARTNUM=0 \
-      PLAT=a3700 \
-      WTP=$(pwd)/../A3700-utils-marvell \
-      MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
-      all fip
+      # Can't link something without this.
+      export CFLAGS=-fno-stack-protector
 
+      # Needed to build WTMI binary.
+      export CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi-
+
+      # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
+      make \
+        DEBUG=1 \
+        USE_COHERENT_MEM=0 \
+        LOG_LEVEL=50 \
+        SECURE=0 \
+        CLOCKSPRESET=CPU_1000_DDR_800 \
+        DDR_TOPOLOGY=5 \
+        BOOTDEV=SPINOR \
+        PARTNUM=0 \
+        PLAT=a3700 \
+        WTP=$(pwd)/../A3700-utils-marvell \
+        MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
+        all fip
     popd >/dev/null
   '';
 
