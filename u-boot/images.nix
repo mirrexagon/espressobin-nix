@@ -38,7 +38,7 @@ in stdenv.mkDerivation rec {
   ];
 
   # Build instructions sort of used from
-  # https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/80316c829d0c56b67eb60c39fe3fd6266b314860/docs/marvell/build.txt
+  # https://github.com/MarvellEmbeddedProcessors/atf-marvell/blob/atf-v1.5-armada-18.12/docs/marvell/build.txt
   buildPhase = ''
     # The build process modifies these directories so we make copies of them
     # and make them writable.
@@ -46,6 +46,13 @@ in stdenv.mkDerivation rec {
     cp -r ${a3700-utils-marvell} A3700-utils-marvell
     cp -r ${mv-ddr-marvell} mv-ddr-marvell
     chmod -R 755 atf-marvell A3700-utils-marvell mv-ddr-marvell
+
+    # DEBUGGING PATCHES
+    # Problem: in plat/marvell/common/marvell_bl1_setup.c, bl1_size should be small, but
+    # it comes out as some huge number. This triggers an assertion.
+    pushd atf-marvell >/dev/null
+      patch -p1 < ${./0001-Add-logging.patch}
+    popd >/dev/null
 
     # A3700-utils has some scripts the build process will run.
     patchShebangs A3700-utils-marvell
@@ -57,12 +64,14 @@ in stdenv.mkDerivation rec {
     # There are some tools we can build, one of which we need in the build.
     # There are already checked-in binaries, but let's not use them.
     pushd A3700-utils-marvell/wtptp/src/TBB_Linux >/dev/null
-      make -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
+      # TODO: Remove -j16
+      make -j16  -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
       cp release/TBB_linux ../../linux/tbb_linux
     popd >/dev/null
 
     pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
-      make -f makefile.mk
+      # TODO: Remove -j16
+      make -j16 -f makefile.mk
       cp WtpDownload_linux ../../linux
     popd >/dev/null
 
