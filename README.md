@@ -1,6 +1,8 @@
 # NixOS on the Marvell ESPRESSObin
 http://espressobin.net/
 
+This does NOT currently work. I'm working on getting the built bootloader to boot correctly.
+
 ## My board
 I have an V7 1GB board.
 
