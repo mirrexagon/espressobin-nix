@@ -12,8 +12,9 @@ buildUBoot rec {
   };
 
   extraPatches = [
-    ./0001-Enable-distro-boot-config.patch
-    ./0002-Modify-armada-common-environment-for-distro-boot.patch
+    # TODO: Enable this when the u-boot actually boots properly
+    # ./0001-Enable-distro-boot-config.patch
+    # ./0002-Modify-armada-common-environment-for-distro-boot.patch
   ];
 
   extraMakeFlags = [ "DEVICE_TREE=armada-3720-espressobin" ];
