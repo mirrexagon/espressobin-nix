@@ -1,6 +1,6 @@
 # Reference:
 # https://gitlab.denx.de/u-boot/u-boot/-/blob/master/doc/README.marvell
-# https://github.com/openwrt/openwrt/pull/3360/files
+# https://github.com/openwrt/openwrt/pull/3360
 
 { lib, buildUBoot, fetchurl }:
 

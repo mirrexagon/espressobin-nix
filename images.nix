@@ -1,3 +1,7 @@
+# Reference:
+# https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/plat/marvell/armada/build.rst
+# https://github.com/openwrt/openwrt/pull/3360
+
 { stdenv, fetchFromGitHub, ubootEspressobin, buildPackages }:
 
 let
@@ -57,12 +61,12 @@ in stdenv.mkDerivation rec {
     # There are some tools we can build, one of which we need in the build.
     # There are already checked-in binaries, but let's not use them.
     pushd A3700-utils-marvell/wtptp/src/TBB_Linux >/dev/null
-      make -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
+      make -j$NIX_BUILD_CORES -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
       cp release/TBB_linux ../../linux/tbb_linux
     popd >/dev/null
 
     pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
-      make -f makefile.mk
+      make -j$NIX_BUILD_CORES -f makefile.mk
       cp WtpDownload_linux ../../linux
     popd >/dev/null
 
@@ -72,21 +76,13 @@ in stdenv.mkDerivation rec {
       # Can't link something without this.
       export CFLAGS=-fno-stack-protector
 
-      # Needed to build WTMI binary.
-      export CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi-
-
       # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
       make \
         CROSS_COMPILE=aarch64-unknown-linux-gnu- \
+        CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
         BL33=${ubootEspressobin}/u-boot.bin \
-        DEBUG=1 \
-        USE_COHERENT_MEM=0 \
-        LOG_LEVEL=50 \
-        SECURE=0 \
         CLOCKSPRESET=CPU_800_DDR_800 \
         DDR_TOPOLOGY=5 \
-        BOOTDEV=SPINOR \
-        PARTNUM=0 \
         PLAT=a3700 \
         WTP=$(pwd)/../A3700-utils-marvell \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
@@ -96,7 +92,7 @@ in stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir $out
-    cp -r arm-trusted-firmware/build/a3700/debug/{flash-image.bin,uart-images} $out
+    cp -r arm-trusted-firmware/build/a3700/release/{flash-image.bin,uart-images} $out
 
     mkdir $out/bin
     cp A3700-utils-marvell/wtptp/linux/WtpDownload_linux $out/bin
