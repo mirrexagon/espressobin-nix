@@ -14,7 +14,7 @@ The bootloader image produced by this repo is currently only for ESPRESSObin V7 
 1. Add `console=ttyMV0,115200n8` to the kernel command line.
 
 ## TODO
-- Fix fdtfile determination in U-Boot (V7 vs not).
+- Fix fdtfile determination in U-Boot (V7 vs not). I think this is broken by the board/board_name variables being wrong.
 
 ## Links
 - Issue for mainline U-Boot on the ESPRESSObin: https://github.com/openwrt/openwrt/pull/3360
