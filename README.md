@@ -15,6 +15,7 @@ The bootloader image produced by this repo is currently only for ESPRESSObin V7 
 
 ## TODO
 - Fix fdtfile determination in U-Boot (V7 vs not). I think this is broken by the board/board_name variables being wrong.
+- Fix MAC addresses not being passed to Linux.
 
 ## Links
 - Issue for mainline U-Boot on the ESPRESSObin: https://github.com/openwrt/openwrt/pull/3360
