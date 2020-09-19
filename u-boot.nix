@@ -11,6 +11,8 @@ buildUBoot rec {
     sha256 = "0q7jpca26hf756g54dg9mbgsl5yrgwkz7z1h4yplvhgjglndsyqa";
   };
 
+  extraMakeFlags = [ ];
+
   defconfig = "mvebu_espressobin-88f3720_defconfig";
   filesToInstall = [ "u-boot.bin" ];
 
