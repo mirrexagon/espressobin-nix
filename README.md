@@ -14,7 +14,7 @@ The bootloader image produced by this repo is currently only for ESPRESSObin V7 
 1. Add `console=ttyMV0,115200n8` to the kernel command line.
 
 ## TODO
-- Incorporate patches from https://github.com/openwrt/openwrt/pull/3360/files (or wait for them to go upstream), but check fdtfile one, since current NixOS aarch64 image doesn't include a `-v7.dtb`.
+- Fix fdtfile determination in U-Boot (V7 vs not).
 
 ## Links
 - Issue for mainline U-Boot on the ESPRESSObin: https://github.com/openwrt/openwrt/pull/3360
