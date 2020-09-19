@@ -7,7 +7,11 @@ Build with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages`
 The bootloader image produced by this repo is currently only for ESPRESSObin V7 1GB!
 
 ## Extra steps after flashing
-1. `setenv fdtfile marvell/armada-3720-espressobin.dtb`
+1. Load default U-Boot environment with `env default -a`.
+1. Set the correct device tree filename in U-Boot with `setenv fdtfile marvell/armada-3720-espressobin.dtb; saveenv`.
+
+## Boot the generic aarch64 image
+1. Add `console=ttyMV0,115200n8` to the kernel command line.
 
 ## TODO
 - Incorporate patches from https://github.com/openwrt/openwrt/pull/3360/files (or wait for them to go upstream), but check fdtfile one, since current NixOS aarch64 image doesn't include a `-v7.dtb`.
