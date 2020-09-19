@@ -1,7 +1,7 @@
 # ESPRESSObin SD card image.
 # Build with: nix-build '<nixpkgs/nixos>' -A config.system.build.sdImage -I nixos-config=./sd-image.nix
 
-{ ... }: {
+{ config, lib, pkgs, ... }: {
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
   ];
