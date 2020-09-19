@@ -4,5 +4,5 @@ let
   callPackage = super.lib.callPackageWith (self);
 in {
   ubootEspressobin = callPackage ./u-boot.nix {};
-  ubootEspressoImages = callPackage ./images.nix {};
+  ubootEspressobinImages = callPackage ./images.nix {};
 }
