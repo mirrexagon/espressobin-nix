@@ -5,10 +5,13 @@
 
 buildUBoot rec {
   version = "2020.10-rc4";
+
   src = fetchurl {
     url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2";
     sha256 = "0q7jpca26hf756g54dg9mbgsl5yrgwkz7z1h4yplvhgjglndsyqa";
   };
+
+  defconfig = "mvebu_espressobin-88f3720_defconfig";
 
   # https://github.com/openwrt/openwrt/pull/3360
   # TODO: Remove when these are upstreamed, hopefully into the full 2020.10 release.
@@ -22,7 +25,12 @@ buildUBoot rec {
     ./patches/134-arm-mvebu-Espressobin-Set-environment-variable-fdtfi.patch
   ];
 
-  defconfig = "mvebu_espressobin-88f3720_defconfig";
+  preConfigure = ''
+    # enable additional options beyond <device>_defconfig
+    echo CONFIG_NET_RANDOM_ETHADDR=y >> configs/${defconfig}
+    echo CONFIG_CMD_SETEXPR=y >> configs/${defconfig}
+  '';
+
   filesToInstall = [ "u-boot.bin" ];
 
   extraMeta = with lib; {
