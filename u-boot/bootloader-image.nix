@@ -30,7 +30,7 @@ let
   };
 in stdenv.mkDerivation rec {
   name = "espressobin-u-boot-images-${version}";
-  version = "2020.10-rc4";
+  version = "2020.10";
 
   phases = [ "buildPhase" "installPhase" ];
 
