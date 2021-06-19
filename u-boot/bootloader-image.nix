@@ -2,7 +2,7 @@
 # https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/plat/marvell/armada/build.rst
 # https://github.com/openwrt/openwrt/pull/3360
 
-{ stdenv, fetchFromGitHub, ubootEspressobin, buildPackages }:
+{ stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages }:
 
 let
   arm-trusted-firmware = fetchFromGitHub {
@@ -28,9 +28,10 @@ let
     rev = "a881467ef0f0185e6570dd0483023fde93cbb5f5";
     sha256 = "176dqvyig2kc0awd50xika32wyxh1rprs5lmlwvfy6klis4wil27";
   };
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   name = "espressobin-u-boot-images-${version}";
-  version = "2020.10";
+  version = "2021.04";
 
   phases = [ "buildPhase" "installPhase" ];
 
@@ -98,7 +99,7 @@ in stdenv.mkDerivation rec {
     cp A3700-utils-marvell/wtptp/linux/WtpDownload_linux $out/bin
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     maintainers = [ maintainers.mirrexagon ];
 
     # TODO: Expects to be cross-compiled, given we set the CROSS_COMPILE variable.
