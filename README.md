@@ -6,6 +6,8 @@ Build with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages`
 
 The bootloader image produced by this repo is currently only for ESPRESSObin V7 1GB!
 
+The reason for this is that different boards have different memory layouts, and the memory layout is current hardcoded to the V7 1GB board.
+
 ## Extra steps after flashing
 1. Load default U-Boot environment with `env default -a`.
 
