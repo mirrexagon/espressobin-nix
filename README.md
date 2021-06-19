@@ -8,13 +8,11 @@ The bootloader image produced by this repo is currently only for ESPRESSObin V7 
 
 ## Extra steps after flashing
 1. Load default U-Boot environment with `env default -a`.
-1. Set the correct device tree filename in U-Boot with `setenv fdtfile marvell/armada-3720-espressobin.dtb; saveenv`.
 
 ## Boot the generic aarch64 image
 1. Add `console=ttyMV0,115200n8` to the kernel command line.
 
 ## TODO
-- Fix fdtfile determination in U-Boot (V7 vs not). I think this is broken by the board/board_name variables being wrong.
 - Fix MAC addresses not being passed to Linux.
 
 ## Links
