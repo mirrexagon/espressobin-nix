@@ -14,7 +14,7 @@ Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-in
 1. Copy `result/flash-image.bin` to a USB stick.
 1. Connect a USB cable to the serial port on the ESPRESSObin and boot it with the current bootloader.
 1. Press enter to stop autoboot and get to the shell.
-1. Run `usb start`
+1. Run `usb reset`
 1. Run `bubt flash-image.bin spi usb`
 1. Run `reset` to reset the board and see if it boots into the newly-flashed U-Boot.
 
