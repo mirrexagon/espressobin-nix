@@ -6,7 +6,7 @@ Build with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages`
 
 The bootloader image produced by this repo is currently only for ESPRESSObin V7 1GB!
 
-The reason for this is that different boards have different memory layouts, and the memory layout is current hardcoded to the V7 1GB board.
+The reason for this is that different boards have different memory layouts, and the memory layout is currently hardcoded to the V7 1GB board.
 
 ### Flashing
 Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-index.php?page=Update+the+Bootloader
