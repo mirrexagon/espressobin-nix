@@ -14,12 +14,18 @@ Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-in
 1. Copy `result/flash-image.bin` to a USB stick.
 1. Connect a USB cable to the serial port on the ESPRESSObin and boot it with the current bootloader.
 1. Press enter to stop autoboot and get to the shell.
-1. Run `usb reset`
 1. Run `bubt flash-image.bin spi usb`
 1. Run `reset` to reset the board and see if it boots into the newly-flashed U-Boot.
 
 ### Extra steps after flashing
-1. Load default U-Boot environment with `env default -a`, and save it with `env save`.
+Stop autoboot, load the default U-Boot environment with `env default -a`, save it with `env save`, then `reset`.
+
+The goal is to get the `fdtfile` U-Boot variable to be automatically set correctly. I've seen corruption the first time I run those commands where the `m` in `marvell` is missing (see below). Running the commands again seems to set it correctly.
+
+To see the current value, run `echo $fdtfile`.
+
+- On an ESPRESSObin V5, the correct value is `marvell/armada-3720-espressobin.dtb`.
+- On an ESPRESSObin V7, the correct value is `marvell/armada-3720-espressobin-v7.dtb`.
 
 ### Recovering from a bad flash
 See https://github.com/MarvellEmbeddedProcessors/u-boot-marvell/blob/u-boot-2017.03-armada-17.06/doc/mvebu/uart_boot.txt
