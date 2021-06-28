@@ -39,12 +39,15 @@ To see the current value, run `echo $fdtfile`.
 - Set the boot jumpers back to booting from the SPI NOR flash and reset the board (press the reset button or unplug and plug in the power).
 
 ## SD image
-The default Aarch64 NixOS image will boot unmodified on the ESPRESSObin, but there will be no serial output by default.
+The default AArch64 NixOS image will boot unmodified on the ESPRESSObin, but there will be no serial output by default.
 
 To get serial output over USB in Linux, `console=ttyMV0,115200n8` needs to be added to the kernel command line.
 
-To build an SD card image with this already set, run `nix-build '<nixpkgs/nixos>' -A config.system.build.sdImage -I nixos-config=./sd-image.nix`\
-TODO: This probably requires an Aarch64 host, figure out how to cross-compile.
+To build an SD card image with this already set (and using the latest Linux kernel), run `nix-build '<nixpkgs/nixos>' -A config.system.build.sdImage -I nixos-config=./sd-image.nix`
+
+This requires either an AArch64 host, or enabling AArch64 emulation in NixOS: https://nixos.wiki/wiki/NixOS_on_ARM#Compiling_through_QEMU
+
+TODO: Cross compilation, eg. https://discourse.nixos.org/t/how-to-cross-compile-the-sd-card-images/12751
 
 ## TODO
 - Fix MAC addresses not being passed to Linux.
