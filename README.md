@@ -1,7 +1,7 @@
 # NixOS on the Marvell ESPRESSObin
 http://espressobin.net/
 
-## U-Boot
+## Bootloader
 Different versions of the ESPRESSObin board have different memory layouts, which require different builds of the bootloader.
 
 Build the bootloader with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_<configuration>`, replacing `<configuration>` with one of:
@@ -34,9 +34,9 @@ To see the current value, run `echo $fdtfile`.
 - On an ESPRESSObin V7, the correct value is `marvell/armada-3720-espressobin-v7.dtb`.
 
 ### Recovering from a bad flash
-See https://github.com/MarvellEmbeddedProcessors/u-boot-marvell/blob/u-boot-2017.03-armada-17.06/doc/mvebu/uart_boot.txt
-
-`WtpDownload_linux` is built as part of `ubootEspressobinImages`.
+- Set the boot jumpers on the board to boot into UART mode: http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces#Boot_selection
+- Connect the USB serial port, ensure it comes up as `/dev/ttyUSB0`, then run `./uart-recover.sh <configuration>`, where `<configuration>` is as in the U-Boot section.
+- Set the boot jumpers back to booting from the SPI NOR flash and reset the board (press the reset button or unplug and plug in the power).
 
 ## SD image
 The default Aarch64 NixOS image will boot unmodified on the ESPRESSObin, but there will be no serial output by default.
@@ -48,10 +48,6 @@ TODO: This probably requires an Aarch64 host, figure out how to cross-compile.
 
 ## TODO
 - Fix MAC addresses not being passed to Linux.
-
-## Links
-- U-Boot documentation for Marvell SoCs: https://gitlab.denx.de/u-boot/u-boot/blob/master/doc/README.marvell
-- ARM trusted firmware documentation for Marvell Armada: https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/plat/marvell/armada/build.rst
 
 ## Hardware notes
 - The V7 schematics (page 9) imply you can boot U-Boot from SD card by setting the three mode jumpers to 1. The [wiki page](http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces) table seems to be wrong, all modes except SPI NOR flash are the same.
