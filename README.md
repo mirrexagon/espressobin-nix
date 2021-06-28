@@ -33,6 +33,8 @@ See https://github.com/MarvellEmbeddedProcessors/u-boot-marvell/blob/u-boot-2017
 `WtpDownload_linux` is built as part of `ubootEspressobinImages`.
 
 ## SD image
+The default Aarch64 NixOS image will boot unmodified on the ESPRESSObin, but there will be no serial output by default.
+
 To get serial output over USB in Linux, `console=ttyMV0,115200n8` needs to be added to the kernel command line.
 
 To build an SD card image with this already set, run `nix-build '<nixpkgs/nixos>' -A config.system.build.sdImage -I nixos-config=./sd-image.nix`\
