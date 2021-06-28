@@ -2,7 +2,14 @@
 # https://github.com/dhewg/openwrt/blob/d31783329b7ccf23d1c084873f1ff084267df4c3/package/boot/arm-trusted-firmware-mvebu/Makefile
 # https://github.com/ARM-software/arm-trusted-firmware/blob/v2.4/docs/plat/marvell/armada/build.rst
 
-{ stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages }:
+{ stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages, boardName, ddrTopology }:
+
+assert ddrTopology == 0 # ESPRESSObin 512 MB
+  || ddrTopology == 2 # ESPRESSObin V3-V5 1 GB, two memory chips (2CS)
+  || ddrTopology == 4 # ESPRESSObin V3-V5 1 GB, single memory chip (1CS)
+  || ddrTopology == 5 # ESPRESSObin V7 1 GB
+  || ddrTopology == 6 # ESPRESSObin V7 2 GB
+  || ddrTopology == 7; # ESPRESSObin V3-V5 2 GB
 
 let
   arm-trusted-firmware = fetchFromGitHub {
@@ -30,7 +37,7 @@ let
   };
 in
 stdenv.mkDerivation rec {
-  name = "espressobin-u-boot-images-${version}";
+  name = "espressobin-u-boot-images-${version}-${boardName}";
   version = "2021.04";
 
   phases = [ "buildPhase" "installPhase" ];
@@ -76,14 +83,12 @@ stdenv.mkDerivation rec {
       # Can't link something without this.
       export CFLAGS=-fno-stack-protector
 
-      # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
-      # TODO: Try CPU_1000_DDR_800
       make \
         CROSS_COMPILE=aarch64-unknown-linux-gnu- \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
         BL33=${ubootEspressobin}/u-boot.bin \
         CLOCKSPRESET=CPU_1000_DDR_800 \
-        DDR_TOPOLOGY=5 \
+        DDR_TOPOLOGY=${toString ddrTopology} \
         PLAT=a3700 \
         WTP=$(pwd)/../A3700-utils-marvell \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \

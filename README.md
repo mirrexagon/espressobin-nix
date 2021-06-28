@@ -2,11 +2,17 @@
 http://espressobin.net/
 
 ## U-Boot
-Build with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages`.
+Different versions of the ESPRESSObin board have different memory layouts, which require different builds of the bootloader.
 
-The bootloader image produced by this repo is currently only for ESPRESSObin V7 1GB!
+Build the bootloader with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_<configuration>`, replacing `<configuration>` with one of:
+- `512MB `
+- `V5_1GB_2CS `
+- `V5_1GB_1CS `
+- `V7_1GB `
+- `V7_2GB `
+- `V5_2GB `
 
-The reason for this is that different boards have different memory layouts, and the memory layout is currently hardcoded to the V7 1GB board.
+eg. To build for the V7 1GB board, run `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_V7_1GB`
 
 ### Flashing
 Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-index.php?page=Update+the+Bootloader
@@ -15,7 +21,7 @@ Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-in
 1. Connect a USB cable to the serial port on the ESPRESSObin and boot it with the current bootloader.
 1. Press enter to stop autoboot and get to the shell.
 1. Run `bubt flash-image.bin spi usb`
-1. Run `reset` to reset the board and see if it boots into the newly-flashed U-Boot.
+1. Run `reset` to reset the board and boot into the new bootloader.
 
 ### Extra steps after flashing
 Stop autoboot, load the default U-Boot environment with `env default -a`, save it with `env save`, then `reset`.
