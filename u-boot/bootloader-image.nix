@@ -1,6 +1,6 @@
-# Reference:
-# https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/plat/marvell/armada/build.rst
-# https://github.com/openwrt/openwrt/pull/3360
+# References:
+# https://github.com/dhewg/openwrt/blob/d31783329b7ccf23d1c084873f1ff084267df4c3/package/boot/arm-trusted-firmware-mvebu/Makefile
+# https://github.com/ARM-software/arm-trusted-firmware/blob/v2.4/docs/plat/marvell/armada/build.rst
 
 { stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages }:
 
@@ -9,8 +9,8 @@ let
     # License: BSD 3-clause
     owner = "Arm-software";
     repo = "arm-trusted-firmware";
-    rev = "v2.3";
-    sha256 = "113mcf1hwwl0i90cqh08lywxs1bfbg0nwqibay9wlkmx1a5v0bnj";
+    rev = "v2.4";
+    sha256 = "sha256-o9/UZ8ZTPbPlFcQ3Ay0AdhIQ6boTBc3xb8uUINOxYIo=";
   };
 
   a3700-utils-marvell = fetchFromGitHub {
@@ -18,15 +18,15 @@ let
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
     rev = "096797908ddd69a679fd55595c41fc02809829a9";
-    sha256 = "14xxmrirnzchszb4q4646lnpgdb630gmma97qqk18nz3yhkwx4id";
+    sha256 = "sha256-LZLOJ/TjWxQmxiepWh8YZrV3LTXEEEzW15B9m2OuvZM=";
   };
 
   mv-ddr-marvell = fetchFromGitHub {
     # License: GPL 2 or later
     owner = "MarvellEmbeddedProcessors";
     repo = "mv-ddr-marvell";
-    rev = "a881467ef0f0185e6570dd0483023fde93cbb5f5";
-    sha256 = "176dqvyig2kc0awd50xika32wyxh1rprs5lmlwvfy6klis4wil27";
+    rev = "6fb99002be5dec9c7f5375b074f53148dbc0739c";
+    sha256 = "sha256-uyBmj5X8jL9dIV7ALt5+EdgbJET94owlShcU0kdM5Rc=";
   };
 in
 stdenv.mkDerivation rec {
@@ -42,8 +42,7 @@ stdenv.mkDerivation rec {
     buildPackages.cryptopp
   ];
 
-  # https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/plat/marvell/armada/build.rst
-  # https://github.com/dhewg/openwrt/blob/3686395eadc12457d9555b3f03e5672a56997120/package/boot/arm-trusted-firmware-mvebu/Makefile
+
   buildPhase = ''
     # The build process modifies these directories so we make copies of them
     # and make them writable.
@@ -78,6 +77,7 @@ stdenv.mkDerivation rec {
       export CFLAGS=-fno-stack-protector
 
       # DDR_TOPOLOGY=5 is DDR4 1CS 1GB.
+      # TODO: Try CPU_1000_DDR_800
       make \
         CROSS_COMPILE=aarch64-unknown-linux-gnu- \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
@@ -87,7 +87,7 @@ stdenv.mkDerivation rec {
         PLAT=a3700 \
         WTP=$(pwd)/../A3700-utils-marvell \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
-        all fip
+        all mrvl_flash
     popd >/dev/null
   '';
 
