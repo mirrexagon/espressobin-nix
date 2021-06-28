@@ -82,7 +82,7 @@ stdenv.mkDerivation rec {
         CROSS_COMPILE=aarch64-unknown-linux-gnu- \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
         BL33=${ubootEspressobin}/u-boot.bin \
-        CLOCKSPRESET=CPU_800_DDR_800 \
+        CLOCKSPRESET=CPU_1000_DDR_800 \
         DDR_TOPOLOGY=5 \
         PLAT=a3700 \
         WTP=$(pwd)/../A3700-utils-marvell \
