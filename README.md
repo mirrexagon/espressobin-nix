@@ -49,8 +49,51 @@ This requires either an AArch64 host, or enabling AArch64 emulation in NixOS: ht
 
 TODO: Cross compilation, eg. https://discourse.nixos.org/t/how-to-cross-compile-the-sd-card-images/12751
 
-## TODO
-- Fix MAC addresses not being passed to Linux.
+## NixOS configuration
+Some special configuration is needed to make things work as desired.
+
+### Serial console
+```nix
+# To get a console on the micro-USB serial port.
+boot.kernelParams = [ "console=ttyMV0,115200n8" ];
+```
+
+### MAC addresses
+MAC addresses are randomized on boot since they are not set up in any way by U-Boot.
+
+These can be set in NixOS configuration instead:
+
+```nix
+# These are the MAC addresses for my unit, based on what's printed on the case.
+# It's recommended to adjust these if your unit has a different MAC address
+# printed.
+networking.interfaces.wan.macAddress = "f0:ad:4e:09:08:a0";
+networking.interfaces.lan0.macAddress = "f0:ad:4e:09:08:a1";
+networking.interfaces.lan1.macAddress = "f0:ad:4e:09:08:a2";
+```
+
+### DHCP and `eth0`
+There are some issues around how the network interfaces work, where `eth0` is
+the connection between the SoC and the internal ethernet switch, and `wan`,
+`lan0`, and `lan1` are ports on that switch.
+
+This is what I did to get DHCP working on the `wan` interface - it probably
+works with `lan0` and `lan1` as well, adding those in the same way.
+
+```nix
+# eth0 needs to be up for the other interfaces to work.
+# https://github.com/mirrexagon/espressobin-nix/issues/2
+# https://github.com/systemd/systemd/issues/7478
+networking.interfaces.wan.useDHCP = true;
+networking.localCommands = ''
+  ip link set eth0 up
+'';
+```
+
+See these links for more information and discussion:
+
+- https://github.com/mirrexagon/espressobin-nix/issues/2
+- https://github.com/systemd/systemd/issues/7478
 
 ## Hardware notes
 - The V7 schematics (page 9) imply you can boot U-Boot from SD card by setting the three mode jumpers to 1. The [wiki page](http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces) table seems to be wrong, all modes except SPI NOR flash are the same.
