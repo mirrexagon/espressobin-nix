@@ -4,7 +4,7 @@ http://espressobin.net/
 ## Bootloader
 Different versions of the ESPRESSObin board have different memory layouts, which require different builds of the bootloader.
 
-Build the bootloader with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_<configuration>`, replacing `<configuration>` with one of:
+Build the bootloader without needing to clone the repository with `nix build --experimental-features 'nix-command flakes' github:mirrexagon/espressobin-nix#ubootEspressobinImages_<configuration>`, replacing `<configuration>` with one of:
 - `512MB `
 - `V5_1GB_2CS `
 - `V5_1GB_1CS `
@@ -12,9 +12,9 @@ Build the bootloader with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEsp
 - `V7_2GB `
 - `V5_2GB `
 
-eg. To build for the V7 1GB board, run `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_V7_1GB`
+eg. To build for the V7 1GB board, run `nix build --experimental-features 'nix-command flakes' github:mirrexagon/espressobin-nix#ubootEspressobinImages_V7_1GB`
 
-### Flashing
+### Flashing from the original bootloader
 Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-index.php?page=Update+the+Bootloader
 
 1. Copy `result/flash-image.bin` to a USB stick.
@@ -26,7 +26,7 @@ Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-in
 ### Extra steps after flashing
 Stop autoboot, load the default U-Boot environment with `env default -a`, save it with `env save`, then `reset`.
 
-The goal is to get the `fdtfile` U-Boot variable to be automatically set correctly. I've seen corruption the first time I run those commands where the `m` in `marvell` is missing (see below). Running the commands again seems to set it correctly.
+The goal is to get the `fdtfile` U-Boot variable to be automatically set correctly. I've seen corruption the first time I run those commands where the `m` in `marvell` is missing (see below). Running the commands again seems to set it correctly. See https://github.com/mirrexagon/espressobin-nix/issues/6
 
 To see the current value, run `echo $fdtfile`.
 

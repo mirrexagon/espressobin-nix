@@ -2,6 +2,10 @@
 # https://github.com/dhewg/openwrt/blob/d31783329b7ccf23d1c084873f1ff084267df4c3/package/boot/arm-trusted-firmware-mvebu/Makefile
 # https://github.com/ARM-software/arm-trusted-firmware/blob/v2.4/docs/plat/marvell/armada/build.rst
 
+# TODO:
+# - https://github.com/dhewg/openwrt/blob/master/package/boot/arm-trusted-firmware-mvebu/Makefile
+# - https://github.com/turris-cz/mox-boot-builder
+
 { stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages, boardName, ddrTopology }:
 
 assert ddrTopology == 0 # ESPRESSObin 512 MB
@@ -24,21 +28,21 @@ let
     # License: BSD 3-clause
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
-    rev = "096797908ddd69a679fd55595c41fc02809829a9";
-    sha256 = "sha256-LZLOJ/TjWxQmxiepWh8YZrV3LTXEEEzW15B9m2OuvZM=";
+    rev = "97f01f5feaf9ef6168e2a2096abaf56371939e58";
+    sha256 = "sha256-aZLOJ/TjWxQmxiepWh8YZrV3LTXEEEzW15B9m2OuvZM=";
   };
 
   mv-ddr-marvell = fetchFromGitHub {
     # License: GPL 2 or later
     owner = "MarvellEmbeddedProcessors";
     repo = "mv-ddr-marvell";
-    rev = "6fb99002be5dec9c7f5375b074f53148dbc0739c";
-    sha256 = "sha256-uyBmj5X8jL9dIV7ALt5+EdgbJET94owlShcU0kdM5Rc=";
+    rev = "efcad0e2fae66a8b6f84a4dd2326f5add67569d5";
+    sha256 = "sha256-ayBmj5X8jL9dIV7ALt5+EdgbJET94owlShcU0kdM5Rc=";
   };
 in
 stdenv.mkDerivation rec {
   name = "espressobin-u-boot-images-${version}-${boardName}";
-  version = "2021.04";
+  version = ubootEspressobin.version;
 
   phases = [ "buildPhase" "installPhase" ];
 
@@ -48,7 +52,6 @@ stdenv.mkDerivation rec {
     buildPackages.which
     buildPackages.cryptopp
   ];
-
 
   buildPhase = ''
     # The build process modifies these directories so we make copies of them
@@ -84,7 +87,6 @@ stdenv.mkDerivation rec {
       export CFLAGS=-fno-stack-protector
 
       make \
-        CROSS_COMPILE=aarch64-unknown-linux-gnu- \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
         BL33=${ubootEspressobin}/u-boot.bin \
         CLOCKSPRESET=CPU_1000_DDR_800 \
@@ -106,9 +108,6 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     maintainers = [ maintainers.mirrexagon ];
-
-    # TODO: Expects to be cross-compiled, given we set the CROSS_COMPILE variable.
-    # Also uses 32-bit ARM gcc. What should the platforms be?
     platforms = [ "aarch64-linux" ];
 
     # TODO: Figure out if this should be something more free.
