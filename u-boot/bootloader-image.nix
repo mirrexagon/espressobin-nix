@@ -54,7 +54,14 @@ stdenv.mkDerivation rec {
     buildPackages.openssl
     buildPackages.which
     buildPackages.cryptopp
+    buildPackages.cryptopp.dev
   ];
+
+  # tbb_linux crashes on run with:
+  # *** buffer overflow detected ***: terminated
+  #
+  # Solution from https://github.com/NixOS/nixpkgs/pull/250775
+  hardeningDisable = [ "fortify" ];
 
   buildPhase = ''
     # The build process modifies these directories so we make copies of them
@@ -69,12 +76,22 @@ stdenv.mkDerivation rec {
 
     # But Perl scripts don't get patched, so we do it manually.
     substituteInPlace A3700-utils-marvell/script/tim2img.pl \
-      --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
+      --replace-fail "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
+
+    # Build WtpDownload_linux, the tool to upload UART images to the board.
+    pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
+      make -j$NIX_BUILD_CORES -f makefile.mk
+      cp WtpDownload_linux ../../linux
+    popd >/dev/null
 
     # Now for the actual boot image build.
     pushd arm-trusted-firmware >/dev/null
       # Can't link something without this.
       export CFLAGS=-fno-stack-protector
+
+      # Work around error in passing the -x flag to `as`, when it is a `gcc` flag.
+      substituteInPlace make_helpers/build_macros.mk \
+        --replace-fail '(ARCH)-as' '(ARCH)-cc'
 
       make \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
@@ -84,8 +101,8 @@ stdenv.mkDerivation rec {
         DDR_TOPOLOGY=${toString ddrTopology} \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
         WTP=$(pwd)/../A3700-utils-marvell \
-        CRYPTOPP_LIBDIR=${buildPackages.cryptopp}/lib/ \
-        CRYPTOPP_INCDIR=${buildPackages.cryptopp}/include/ \
+        CRYPTOPP_LIBDIR=${buildPackages.cryptopp}/lib \
+        CRYPTOPP_INCDIR=${buildPackages.cryptopp.dev}/include/cryptopp \
         BL33=${ubootEspressobin}/u-boot.bin \
         FIP_ALIGN=0x100 \
         mrvl_flash mrvl_uart
@@ -97,7 +114,7 @@ stdenv.mkDerivation rec {
     cp -r arm-trusted-firmware/build/a3700/release/{flash-image.bin,uart-images} $out
 
     mkdir $out/bin
-    cp A3700-utils-marvell/wtptp/linux/WtpDownload_linux $out/bin
+    cp A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux/WtpDownload_linux $out/bin
   '';
 
   meta = with lib; {
