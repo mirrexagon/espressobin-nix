@@ -2,9 +2,7 @@
   description = "ESPRESSObin U-Boot builder";
 
   inputs = {
-    # Commit before 8.2.0 -> 8.4.0 update
-    # which was eefdd0983997458528f78445d04066b6d3fc147d
-    nixpkgs.url = "github:nixos/nixpkgs?ref=88033a4862c1eb55929b8a4163da2137f377e6af";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
   };
 
   outputs = { self, nixpkgs }:

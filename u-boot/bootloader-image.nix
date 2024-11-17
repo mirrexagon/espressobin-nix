@@ -29,7 +29,8 @@ let
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
     rev = "a3e1c67bb378e1d8a938e1b826cb602af83628d2";
-    sha256 = "sha256-pidCdPllGrkpQuyy+96kcjFwi6N7974AyHnqAljXLBs=";
+    sha256 = "sha256-iq53P3BdgpiKSlyzUXwqymidb9pYymZ/JJbTErOi6gU=";
+    leaveDotGit = true;
   };
 
   mv-ddr-marvell = fetchFromGitHub {
@@ -37,7 +38,8 @@ let
     owner = "MarvellEmbeddedProcessors";
     repo = "mv-ddr-marvell";
     rev = "4a3dc0909b64fac119d4ffa77840267b540b17ba";
-    sha256 = "sha256-atsj0FCEkMLfnABsaJZGHKO0ZKad19jsKAkz39fIcFY=";
+    sha256 = "sha256-MJvxCkc5uwMwAgDqwBct5hLIAq5dcYW69XR6V79qo00=";
+    leaveDotGit = true;
   };
 in
 stdenv.mkDerivation rec {
@@ -48,6 +50,7 @@ stdenv.mkDerivation rec {
 
   depsBuildBuild = [
     buildPackages.stdenv.cc
+    buildPackages.git
     buildPackages.openssl
     buildPackages.which
     buildPackages.cryptopp
@@ -68,33 +71,24 @@ stdenv.mkDerivation rec {
     substituteInPlace A3700-utils-marvell/script/tim2img.pl \
       --replace "/usr/bin/perl" "${buildPackages.perl}/bin/perl"
 
-    # There are some tools we can build, one of which we need in the build.
-    # There are already checked-in binaries, but let's not use them.
-    pushd A3700-utils-marvell/wtptp/src/TBB_Linux >/dev/null
-      make -j$NIX_BUILD_CORES -f TBB_linux.mak LIBDIR=${buildPackages.cryptopp}/include/cryptopp
-      cp release/TBB_linux ../../linux/tbb_linux
-    popd >/dev/null
-
-    pushd A3700-utils-marvell/wtptp/src/Wtpdownloader_Linux >/dev/null
-      make -j$NIX_BUILD_CORES -f makefile.mk
-      cp WtpDownload_linux ../../linux
-    popd >/dev/null
-
     # Now for the actual boot image build.
     pushd arm-trusted-firmware >/dev/null
-
       # Can't link something without this.
       export CFLAGS=-fno-stack-protector
 
       make \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
-        BL33=${ubootEspressobin}/u-boot.bin \
+        USE_COHERENT_MEM=0 \
+        PLAT=a3700 \
         CLOCKSPRESET=CPU_1000_DDR_800 \
         DDR_TOPOLOGY=${toString ddrTopology} \
-        PLAT=a3700 \
-        WTP=$(pwd)/../A3700-utils-marvell \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
-        all mrvl_flash mrvl_uart
+        WTP=$(pwd)/../A3700-utils-marvell \
+        CRYPTOPP_LIBDIR=${buildPackages.cryptopp}/lib/ \
+        CRYPTOPP_INCDIR=${buildPackages.cryptopp}/include/ \
+        BL33=${ubootEspressobin}/u-boot.bin \
+        FIP_ALIGN=0x100 \
+        mrvl_flash mrvl_uart
     popd >/dev/null
   '';
 
