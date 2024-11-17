@@ -20,24 +20,24 @@ let
     # License: BSD 3-clause
     owner = "Arm-software";
     repo = "arm-trusted-firmware";
-    rev = "v2.4";
-    sha256 = "sha256-o9/UZ8ZTPbPlFcQ3Ay0AdhIQ6boTBc3xb8uUINOxYIo=";
+    rev = "v2.11.0";
+    sha256 = "sha256-sXJkpJ/uJ1esCv7zMP3mu9DrMb1jHJg6xd0dnD/CB84=";
   };
 
   a3700-utils-marvell = fetchFromGitHub {
     # License: BSD 3-clause
     owner = "MarvellEmbeddedProcessors";
     repo = "A3700-utils-marvell";
-    rev = "97f01f5feaf9ef6168e2a2096abaf56371939e58";
-    sha256 = "sha256-aZLOJ/TjWxQmxiepWh8YZrV3LTXEEEzW15B9m2OuvZM=";
+    rev = "a3e1c67bb378e1d8a938e1b826cb602af83628d2";
+    sha256 = "sha256-pidCdPllGrkpQuyy+96kcjFwi6N7974AyHnqAljXLBs=";
   };
 
   mv-ddr-marvell = fetchFromGitHub {
     # License: GPL 2 or later
     owner = "MarvellEmbeddedProcessors";
     repo = "mv-ddr-marvell";
-    rev = "efcad0e2fae66a8b6f84a4dd2326f5add67569d5";
-    sha256 = "sha256-ayBmj5X8jL9dIV7ALt5+EdgbJET94owlShcU0kdM5Rc=";
+    rev = "4a3dc0909b64fac119d4ffa77840267b540b17ba";
+    sha256 = "sha256-atsj0FCEkMLfnABsaJZGHKO0ZKad19jsKAkz39fIcFY=";
   };
 in
 stdenv.mkDerivation rec {
@@ -94,7 +94,7 @@ stdenv.mkDerivation rec {
         PLAT=a3700 \
         WTP=$(pwd)/../A3700-utils-marvell \
         MV_DDR_PATH=$(pwd)/../mv-ddr-marvell \
-        all mrvl_flash
+        all mrvl_flash mrvl_uart
     popd >/dev/null
   '';
 
