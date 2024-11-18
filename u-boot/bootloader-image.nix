@@ -1,10 +1,6 @@
 # References:
-# https://github.com/dhewg/openwrt/blob/d31783329b7ccf23d1c084873f1ff084267df4c3/package/boot/arm-trusted-firmware-mvebu/Makefile
-# https://github.com/ARM-software/arm-trusted-firmware/blob/v2.4/docs/plat/marvell/armada/build.rst
-
-# TODO:
-# - https://github.com/dhewg/openwrt/blob/master/package/boot/arm-trusted-firmware-mvebu/Makefile
-# - https://github.com/turris-cz/mox-boot-builder
+# https://github.com/ARM-software/arm-trusted-firmware/blob/v2.11.0/docs/plat/marvell/armada/build.rst
+# https://github.com/turris-cz/mox-boot-builder
 
 { stdenv, lib, fetchFromGitHub, ubootEspressobin, buildPackages, boardName, ddrTopology }:
 
@@ -14,6 +10,10 @@ assert ddrTopology == 0 # ESPRESSObin 512 MB
   || ddrTopology == 5 # ESPRESSObin V7 1 GB
   || ddrTopology == 6 # ESPRESSObin V7 2 GB
   || ddrTopology == 7; # ESPRESSObin V3-V5 2 GB
+
+# The ESPRESSObin is an AArch64 device and this build process makes at least one
+# assumption that we are compiling for aarch64, so we assert it here.
+assert stdenv.hostPlatform.system == "aarch64-linux";
 
 let
   arm-trusted-firmware = fetchFromGitHub {
@@ -30,6 +30,8 @@ let
     repo = "A3700-utils-marvell";
     rev = "a3e1c67bb378e1d8a938e1b826cb602af83628d2";
     sha256 = "sha256-iq53P3BdgpiKSlyzUXwqymidb9pYymZ/JJbTErOi6gU=";
+
+    # NOTE: This causes the hash to change if the repository gets any updates.
     leaveDotGit = true;
   };
 
@@ -39,6 +41,8 @@ let
     repo = "mv-ddr-marvell";
     rev = "4a3dc0909b64fac119d4ffa77840267b540b17ba";
     sha256 = "sha256-MJvxCkc5uwMwAgDqwBct5hLIAq5dcYW69XR6V79qo00=";
+
+    # NOTE: This causes the hash to change if the repository gets any updates.
     leaveDotGit = true;
   };
 in
@@ -87,13 +91,22 @@ stdenv.mkDerivation rec {
     # Now for the actual boot image build.
     pushd arm-trusted-firmware >/dev/null
       # Can't link something without this.
+      # TODO: Remove this if we don't need it anymore
       export CFLAGS=-fno-stack-protector
 
       # Work around error in passing the -x flag to `as`, when it is a `gcc` flag.
       substituteInPlace make_helpers/build_macros.mk \
         --replace-fail '(ARCH)-as' '(ARCH)-cc'
 
+      # For some reason, objcopy for AArch64 doesn't get resolved correctly
+      # by the Makefile build system. This causes it to use the host objcopy
+      # when cross-compiling. So we manually override it via the `aarch64-oc`
+      # variable.
+      # This does assume we are cross-compiling to AArch64.
+
       make \
+        aarch64-oc=${stdenv.cc.targetPrefix}objcopy \
+        CROSS_COMPILE=${stdenv.cc.targetPrefix} \
         CROSS_CM3=${buildPackages.gcc-arm-embedded}/bin/arm-none-eabi- \
         USE_COHERENT_MEM=0 \
         PLAT=a3700 \
