@@ -1,20 +1,31 @@
 # NixOS on the Marvell ESPRESSObin
 http://espressobin.net/
 
+
 ## Bootloader
 Different versions of the ESPRESSObin board have different memory layouts, which require different builds of the bootloader.
 
-Build the bootloader with `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_<configuration>`, replacing `<configuration>` with one of:
-- `512MB `
-- `V5_1GB_2CS `
-- `V5_1GB_1CS `
-- `V7_1GB `
-- `V7_2GB `
-- `V5_2GB `
+Note which one of these applies to your board, and replace `<configuration>` in the instructions below with the appropriate one.
+- `512MB`
+- `V5_1GB_2CS`
+- `V5_1GB_1CS`
+- `V7_1GB`
+- `V7_2GB`
+- `V5_2GB`
 
-eg. To build for the V7 1GB board, run `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_V7_1GB`
+### Cross-compiling via `default.nix`
+Clone the repository and run `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_<configuration>`
 
-### Flashing
+Note that this uses your system nixpkgs, which may not be compatible. The flake build guarantees using a known working revision of nixpkgs.
+
+### Building via the flake
+NOTE: Flake builds don't support cross-compilation. I build it on my `x86_64-linux` NixOS machines by enabling AArch64 binfmt emulation, but that is very slow compared to cross-compilation. See https://wiki.nixos.org/wiki/NixOS_on_ARM/Building_Images#Compiling_through_binfmt_QEMU
+
+Build the bootloader without needing to clone the repository with `nix build --experimental-features 'nix-command flakes' github:mirrexagon/espressobin-nix#packages.aarch64-linux.ubootEspressobinImages_<configuration>`
+
+eg. To build for the V7 1GB board, run `nix build --experimental-features 'nix-command flakes' github:mirrexagon/espressobin-nix#packages.aarch64-linux.ubootEspressobinImages_V7_1GB`
+
+### Flashing from U-Boot (original or from this repo)
 Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-index.php?page=Update+the+Bootloader
 
 1. Copy `result/flash-image.bin` to a USB stick.
@@ -26,16 +37,15 @@ Adapted from the USB stick instructions from http://wiki.espressobin.net/tiki-in
 ### Extra steps after flashing
 Stop autoboot, load the default U-Boot environment with `env default -a`, save it with `env save`, then `reset`.
 
-The goal is to get the `fdtfile` U-Boot variable to be automatically set correctly. I've seen corruption the first time I run those commands where the `m` in `marvell` is missing (see below). Running the commands again seems to set it correctly.
-
-To see the current value, run `echo $fdtfile`.
+The main goal is to get the `fdtfile` U-Boot variable to be automatically set correctly. To see the current value, run `echo $fdtfile`.
 
 - On an ESPRESSObin V5, the correct value is `marvell/armada-3720-espressobin.dtb`.
 - On an ESPRESSObin V7, the correct value is `marvell/armada-3720-espressobin-v7.dtb`.
 
 ### Recovering from a bad flash
+- Make sure you have built the appropriate U-Boot images for your board - the `result` symlink in the repo top level should point to them.
 - Set the boot jumpers on the board to boot into UART mode: http://wiki.espressobin.net/tiki-index.php?page=Ports+and+Interfaces#Boot_selection
-- Connect the USB serial port, ensure it comes up as `/dev/ttyUSB0`, then run `./uart-recover.sh <configuration>`, where `<configuration>` is as in the U-Boot section.
+- Connect the USB serial port, ensure it comes up as `/dev/ttyUSB0`, then run `./uart-recover.sh`, where `<configuration>` is as in the U-Boot section.
 - Set the boot jumpers back to booting from the SPI NOR flash and reset the board (press the reset button or unplug and plug in the power).
 
 ## SD image
@@ -82,8 +92,6 @@ works with `lan0` and `lan1` as well, adding those in the same way.
 
 ```nix
 # eth0 needs to be up for the other interfaces to work.
-# https://github.com/mirrexagon/espressobin-nix/issues/2
-# https://github.com/systemd/systemd/issues/7478
 networking.interfaces.wan.useDHCP = true;
 networking.localCommands = ''
   ip link set eth0 up

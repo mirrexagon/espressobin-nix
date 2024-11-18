@@ -4,11 +4,11 @@
 { lib, buildUBoot, fetchurl }:
 
 buildUBoot rec {
-  version = "2021.04";
+  version = "2024.10";
 
   src = fetchurl {
     url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2";
-    sha256 = "sha256-DUOLG7XM61ehjqLeSg1R975bBbmHF98Fk4Y24Krf4Ro=";
+    sha256 = "sha256-so2vSsF+QxVjYweL9RApdYQTf231D87ZsS3zT2GpL7A=";
   };
 
   defconfig = "mvebu_espressobin-88f3720_defconfig";
