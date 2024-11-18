@@ -18,6 +18,8 @@ Clone the repository and run `nix-build -A pkgsCross.aarch64-multiplatform.uboot
 
 Note that this uses your system nixpkgs, which may not be compatible. The flake build guarantees using a known working revision of nixpkgs.
 
+eg. To build for the V7 1GB board, run `nix-build -A pkgsCross.aarch64-multiplatform.ubootEspressobinImages_V7_1GB`
+
 ### Building via the flake
 NOTE: Flake builds don't support cross-compilation. I build it on my `x86_64-linux` NixOS machines by enabling AArch64 binfmt emulation, but that is very slow compared to cross-compilation. See https://wiki.nixos.org/wiki/NixOS_on_ARM/Building_Images#Compiling_through_binfmt_QEMU
 
