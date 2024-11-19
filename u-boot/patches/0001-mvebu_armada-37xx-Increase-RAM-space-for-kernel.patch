@@ -1,0 +1,25 @@
+From c458e19f11951d82ea841973a61c6f125bd36624 Mon Sep 17 00:00:00 2001
+From: Andrew Abbott <andrew@mirx.dev>
+Date: Tue, 19 Nov 2024 19:12:02 +1100
+Subject: [PATCH] mvebu_armada-37xx: Increase RAM space for kernel
+
+---
+ include/configs/mvebu_armada-37xx.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/mvebu_armada-37xx.h b/include/configs/mvebu_armada-37xx.h
+index 18b55be0d8..f9e96cc111 100644
+--- a/include/configs/mvebu_armada-37xx.h
++++ b/include/configs/mvebu_armada-37xx.h
+@@ -95,7 +95,7 @@
+ 	"fdt_addr_r=0x6f00000\0"	\
+ 	"kernel_addr=0x7000000\0"	\
+ 	"kernel_addr_r=0x7000000\0"	\
+-	"ramdisk_addr_r=0xa000000\0"	\
++	"ramdisk_addr_r=0xb000000\0"	\
+ 	BOOTENV \
+ 	ENV_RW_FILLER
+ 
+-- 
+2.47.0
+

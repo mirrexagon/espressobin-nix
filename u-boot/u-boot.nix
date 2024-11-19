@@ -13,6 +13,10 @@ buildUBoot rec {
 
   defconfig = "mvebu_espressobin-88f3720_defconfig";
 
+  patches = [
+    ./patches/0001-mvebu_armada-37xx-Increase-RAM-space-for-kernel.patch
+  ];
+
   preConfigure = ''
     # enable additional options beyond <device>_defconfig
     echo CONFIG_CMD_SETEXPR=y >> configs/${defconfig}
