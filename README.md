@@ -51,56 +51,34 @@ The main goal is to get the `fdtfile` U-Boot variable to be automatically set co
 - Set the boot jumpers back to booting from the SPI NOR flash and reset the board (press the reset button or unplug and plug in the power).
 
 ## SD image
-The default AArch64 NixOS image will boot unmodified on the ESPRESSObin, but there will be no serial output by default.
+The default AArch64 NixOS image will boot unmodified on the ESPRESSObin.
 
-To get serial output over USB in Linux, `console=ttyMV0,115200n8` needs to be added to the kernel command line.
-
-To build an SD card image with this already set (and using the latest Linux kernel), run `nix-build '<nixpkgs/nixos>' -A config.system.build.sdImage -I nixos-config=./sd-image.nix`
-
-This requires either an AArch64 host, or enabling AArch64 emulation in NixOS: https://nixos.wiki/wiki/NixOS_on_ARM#Compiling_through_QEMU
-
-TODO: Cross compilation, eg. https://discourse.nixos.org/t/how-to-cross-compile-the-sd-card-images/12751
+This should already work as it is set in the device tree, but if you don't get serial output over USB in Linux, `console=ttyMV0,115200n8` needs to be added to the kernel command line.
 
 ## NixOS configuration
-Some special configuration is needed to make things work as desired.
-
-### Serial console
-```nix
-# To get a console on the micro-USB serial port.
-boot.kernelParams = [ "console=ttyMV0,115200n8" ];
-```
 
 ### MAC addresses
-MAC addresses are randomized on boot since they are not set up in any way by U-Boot.
+If not set in the U-Boot environment, MAC addresses are randomized on boot. To set these up so that U-Boot sets them and passes them to Linux, boot to the U-Boot console and set these variables in the environment (using the MAC addresses printed on my device as an example, adjust them to what yours has if you can):
 
-These can be set in NixOS configuration instead:
+- `env set ethaddr f0:ad:4e:09:08:a0` for the switch-SoC connection `end0`
+- `env set eth1addr f0:ad:4e:09:08:a1` for `wan`
+- `env set eth2addr f0:ad:4e:09:08:a2` for `lan0`
+- `env set eth3addr f0:ad:4e:09:08:a3` for `lan1`
+- `env save`
 
-```nix
-# These are the MAC addresses for my unit, based on what's printed on the case.
-# It's recommended to adjust these if your unit has a different MAC address
-# printed.
-networking.interfaces.wan.macAddress = "f0:ad:4e:09:08:a0";
-networking.interfaces.lan0.macAddress = "f0:ad:4e:09:08:a1";
-networking.interfaces.lan1.macAddress = "f0:ad:4e:09:08:a2";
-```
-
-### DHCP and `eth0`
-There are some issues around how the network interfaces work, where `eth0` is
-the connection between the SoC and the internal ethernet switch, and `wan`,
-`lan0`, and `lan1` are ports on that switch.
-
-This is what I did to get DHCP working on the `wan` interface - it probably
-works with `lan0` and `lan1` as well, adding those in the same way.
+A secondary option is setting in NixOS configuration instead. This is slightly less desirable as the MAC addresses in the U-Boot environment (eg. for network boot) will still be randomized.
 
 ```nix
-# eth0 needs to be up for the other interfaces to work.
-networking.interfaces.wan.useDHCP = true;
-networking.localCommands = ''
-  ip link set eth0 up
-'';
+networking.interfaces.end0.macAddress = "f0:ad:4e:09:08:a0";
+networking.interfaces.wan.macAddress = "f0:ad:4e:09:08:a1";
+networking.interfaces.lan0.macAddress = "f0:ad:4e:09:08:a2";
+networking.interfaces.lan1.macAddress = "f0:ad:4e:09:08:a3";
 ```
 
-See these links for more information and discussion:
+### DHCP and `eth0`/`end0`
+On at least Linux 6.6.60, networking should work correctly with a default setup.
+
+See these links for more information and discussion on potential configuration issues with the ESPRESSObin ethernet hardware:
 
 - https://github.com/mirrexagon/espressobin-nix/issues/2
 - https://github.com/systemd/systemd/issues/7478
