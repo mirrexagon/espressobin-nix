@@ -16,7 +16,7 @@ index 18b55be0d8..f9e96cc111 100644
  	"kernel_addr=0x7000000\0"	\
  	"kernel_addr_r=0x7000000\0"	\
 -	"ramdisk_addr_r=0xa000000\0"	\
-+	"ramdisk_addr_r=0xb000000\0"	\
++	"ramdisk_addr_r=0xc000000\0"	\
  	BOOTENV \
  	ENV_RW_FILLER
  
